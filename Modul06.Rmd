@@ -1,0 +1,195 @@
+---
+title: "Modul 06 - Clustering"
+author: "Roni Yunis"
+date: "17/09/2024"
+output: pdf_document
+---
+
+# Pengantar
+
+**K-Means Clustering** adalah algoritma *Unsupervised Learning* yang mencoba mengelompokkan data berdasarkan kesamaannya. *Unsupervised Learning* salah satu paradigma dalam machine learning di mana algoritma diprogram untuk mengekstraksi pola atau informasi dari data tanpa adanya label atau petunjuk eksplicit tentang keluaran yang diinginkan. Dengan kata lain, dalam unsupervised learning, model tidak diberikan label atau target spesifik untuk diprediksi atau dipelajari. Unsupervised learning sering digunakan ketika data tidak memiliki label atau ketika tujuan analisis adalah untuk menemukan pola yang mungkin tidak diketahui sebelumnya:
+
+Contoh penggunaan unsupervised learning meliputi:
+
+1. Rekomendasi Produk: Mengidentifikasi pola konsumen berdasarkan perilaku pembelian untuk memberikan rekomendasi produk tanpa memerlukan label spesifik untuk setiap pengguna.
+
+2. Segmentasi Pelanggan: Mengelompokkan pelanggan berdasarkan preferensi dan perilaku pembelian tanpa memerlukan informasi label kelompok.
+
+3. Analisis Teks: Mengelompokkan dokumen atau teks berdasarkan tema atau topik tanpa memerlukan label kategori untuk setiap dokumen.
+
+**K-Means Clustering**
+
+Dalam K-Means clustering, kita telah menentukan jumlah cluster yang kita ingin datanya dikelompokkan. Algoritma secara acak menetapkan setiap observasi ke cluster, dan menemukan pusat data dari setiap cluster. Kemudian, algoritma melakukan iterasi melalui dua langkah:
+
+1. Tetapkan ulang titik data ke cluster yang sentroidnya paling dekat.
+
+2. Hitung sentroid baru dari setiap cluster.
+
+Kedua langkah ini diulangi sampai variasi cluster tidak dapat dikurangi lebih jauh. Variasi dalam cluster dihitung sebagai jumlah dari jarak Euclid (Euclidean) antara titik data dan sentroid cluster masing-masing.
+
+Dalam kasus ini, kita akan mengklasterisasi informasi dari COVID 19 yang ada pada negara ASIA. Tujuan dari analisis ini adalah untuk melihat apakah pandemi COVID-19 di Negara ASIA bisa di klasterisasi berdasarkan atribut yang sudah ada. Dataset dalam kasus ini bisa di lihat atau diunduh di halaman web berikut https://www.worldometers.info/coronavirus/
+
+Library (tidyverse)  = dplyr + ggplot2 + lubridate
+
+
+# Load Packages
+
+```{r}
+# Manipulasi data
+library(dplyr)
+
+# Visualisasi data
+library(ggplot2)
+
+# Untuk melakukan klasterisasi
+library(cluster)
+
+# fungsi tambahan untuk klasterisasi dan visualisasi
+library(factoextra)
+
+```
+
+# Data Preparation
+Menyiapkan data, data dalam kasus ini sudah di unduh sebelumnya jadi tinggal digunakan
+
+```{r}
+corona <- read.table("data/covid19.dat")
+head(corona)
+```
+
+```{r}
+glimpse(corona)
+```
+
+Dataset berikut berisi 49 baris dan 10 buah kolom. 
+
+Pada bagian ini kita akan melakukan klasterisasi berdasarkan atribut `TotCases`, `TotDeath`, `Recovered`,
+`ActCases` dan `Pop`. Sebelum kita melakukan klastering, kita akan setup terlebih dahulu dengan pendekatan K-Means Clustering.
+
+1. Elemen-elemen pada matriks jarak antar negara yang digunakan adalah Jarak Euclid;
+
+2. Matriks data yang dianalisis distandarisasi mempertimbangkan adanya rentang nilai yang lebar pada atribut jumlah penduduk; dan
+
+3. Jumlah klaster optimal diperiksa dengan menggunakan metode yang dapat digunakan untuk mengidentifikasi jumlah klaster. Ada beberapa metode yang dapat digunakan, seperti metode Siluet, Statistik Gap, Elbow Method, dan lain-lain. 
+
+**Note:** *Silahkan anda pelajari secara mandiri konsep teoritis dari metode-metode untuk mengindentifikasi jumlah klaster tsb*
+
+```{r}
+# Menampilkan nama atribut dalam objek corona yang akan di klasterisasi
+set.seed(999) #memilih secara acak setiap observasi klustering
+covid <- corona[c(1:4,9)] #mengambil atribut ke 1 s/d 4 dan atribut ke 9 (total ada 5 atribut)
+colnames(covid)
+```
+# Menentukan Jumlah Klaster
+
+```{r}
+# Penentuan jumlah klaster dengan metode Siluet
+klaster.Siluet <-  fviz_nbclust(covid, FUNcluster = kmeans, k.max = 10, method = "silhouette") +
+theme(axis.text=element_text(size=9))
+klaster.Siluet$labels$title = "Jumlah Klaster (Siluet)"
+klaster.Siluet$labels$y = "Lebar Siluet"
+klaster.Siluet$labels$x = "Jumlah Klaster"
+```
+
+```{r}
+klaster.Siluet
+```
+
+
+```{r}
+# Penentuan jumlah klaster dengan metode statistik gap
+klaster.Gap = fviz_nbclust(covid, FUNcluster = kmeans, k.max = 10, method = "gap_stat") +
+theme(axis.text=element_text(size=9))
+klaster.Gap$labels$title = "Jumlah Klaster (Statistik Gap)"
+klaster.Gap$labels$y = "Nilai Statistik Gap"
+klaster.Gap$labels$x = "Jumlah Klaster"
+```
+```{r}
+klaster.Gap
+```
+
+
+```{r}
+# Visualisasi hasil penentuan klaster
+gridExtra::grid.arrange(klaster.Siluet, klaster.Gap, nrow=2)
+```
+Memperhatikan jumlah klaster yang direkomendasikan dari kedua metode tersebut, berkisar antar 2 sampai 5 klaster. Dalam kasus ini kita akan melakukan klastering terhadap kasus COVID-19 tersebut diantara nilai rekomendasi klaster tersebut yaitu menjadi 3 dan 4 klaster saja.
+
+**Latihan:** *Sebagai perbandingan silahkan anda lakukan dengan menentukan jumlah klaster berdasarkan rekomendasi yang diberikan*
+
+# Membuat Model Klastering dengan K-Means Clustering
+
+```{r}
+# Menentukan klasterisasi dengan K-Means Clustering
+klasterCovid <-  get_dist(covid, stand = TRUE)
+k3 <-  kmeans(klasterCovid, centers = 3, nstart = 25)
+k4 <-  kmeans(klasterCovid, centers = 4, nstart = 25)
+```
+
+```{r}
+# Mendefinisikan plot diagram dari klasterisasi
+Plot3 <-  fviz_cluster(k3, data = covid, repel = TRUE, labelsize = 7,
+main = "Klasterisasi Kasus Covid-19 Asia - 3 Klaster")
+Plot4 <-  fviz_cluster(k4, data = covid, repel = TRUE, labelsize = 7,
+main = "Klasterisasi Kasus Covid-19 Asia - 4 Klaster")
+```
+
+```{r}
+# Visualisasi Plot klaster 3
+Plot3
+```
+
+```{r}
+# Visualisasi Plot klaster 4
+Plot4
+```
+
+Kalau dilihat dari kedua sumbu pada Grafik yaitu sumbu x dan y, didapatkan komponen-komponen utama yang terbentuk dari kelima atribut yang ada pada objek covid. Komponen utama yang pertama atau bisa dilihat dari Dim1 sebesar 77,1% dan komponen kedua sebesar 11,5%, sehingga dari kedua komponen tersebut dapat memformulasikan nilai matrik sebesar 88,6%. Untuk mengetahui besaran dari kelima komponen utama tersebut bisa dilakukan beberapa hal berikut ini.
+
+```{r}
+# Membentuk 5 komponen utama dari objek Covid yang distandarisasi dan disimpan pada objek clus dengan menggunakan fungsi `princomp()`
+clus <-  princomp(scale(covid))
+
+# Menampilkan pusat dari masing-masing atribut
+clus$center 
+```
+
+```{r}
+# Menampilkan loading values (korelasi) antara komponen utama dengan atribut asal
+clus$loadings 
+```
+
+```{r}
+# Menampilkan nilai Eigen atau nilai karakteristik dari suatu matriks
+eigen <- get_eig(clus)
+eigen
+```
+
+# Akurasi Model
+
+Akurasi klaster bisa diketahui dengan menghitung rasio dari jumlah kuadrat antar klaster dengan
+jumlah kuadrat total. Sehingga bisa dihitung akurasi dari klaster 3 dan klaster 4 sebagai berikut:
+```{r}
+Akurasi_klaster3 <-  (k3$betweenss/k3$totss)*100
+Akurasi_klaster4 <-  (k4$betweenss/k4$totss)*100
+```
+
+```{r}
+# Lihat hasil akurasi
+Akurasi_klaster3
+Akurasi_klaster4
+```
+Kalau dilihat dari hasil diatas, ada peningkatan keakuratan (selisih antara akurasi 4 - akurasi 3). Sehingga bisa simpulkan bahwa ukuran peningkatan akurasinya relatif kecil. Berdasarkan hal tersebut klaster 3 nampaknya menjadi pilihan yang terbaik untuk digunakan.
+
+# Interpretasi hasil akurasi
+
+Berdasarkan hasil akurasi pada data yang sudah dilakukan dengan melihat 5 atribut utama, maka didapatkan 3 klaster utama tentang kondisi COVID 19 di Asia, yang bisa diuraikan sebagai berikut:
+
+1. Klaster 1, yaitu negara dengan tingkat kasus dan kematian yang sangat tinggi yaitu ada 4 negara; China, India, Iran, dan Turki
+2. Klaster 2, yaitu negara dengan tingkat kasus dan kematin yang relatif tinggi, yaitu ada 5 negara; Indonesia, Banglades, Qatar, Saudi Arabia, dan Pakistan
+3. Klaster 3, yaitu negara dengan tingkat kasus dan kematian yang kecil, yaitu ada 40 negara selain negara yang ada pada klaster 1 dan klaster 2
+
+# Referensi
+
+1. K-Means Cluster Analysis,https://uc-r.github.io/kmeans_clustering
+
