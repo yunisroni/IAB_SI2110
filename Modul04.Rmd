@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ---
 title: "Modul 04 - Business Analytics Process and Data Exploration"
 author: "Roni Yunis"
@@ -450,3 +451,457 @@ d.	Laporan, dasbor, pandangan, keputusan, dan intervensi yang efektif untuk digu
 e.	Pelatihan yang efektif untuk pengguna model
 
 
+=======
+---
+title: "Modul 04 - Business Analytics Process and Data Exploration"
+author: "Roni Yunis"
+date: "17/09/2024"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Pengantar
+Dalam pembahasan kali ini, kita akan membahas secara umum proses analisis bisnis dan kaitannya dengan ekplorasi data. Tujuan dari analitika bisnis adalah untuk mendapatkan informasi dari data sehingga dapat membuat keputusan binis yang tepat. Dalam proses analisis bisnis ada beberapa tahapan yang harus dilalui yaitu:
+
+1. Memahami masalah bisnis
+
+2. Mengumpulkan data dan mengintegrasikan data
+
+3. Pra Proses data
+
+4. Ekplorasi dan visualisasi data
+
+5. Menentukan teknik pemodelan atau algaritma
+
+6. Evaluasi model
+
+7. Laporkan hasilnya kepada pihak manajemen
+
+8. Kembangkan model
+
+Dari 8 tahapan tersebut, tahapan yang sangat penting dan berpengaruh pada hasil pengembangan model keputusan adalah tahap **Exploratory Data Analysis (EDA)**. EDA adalah proses ekplorasi data yang bertujuan untuk memahami isi dan komponen penyusun data. Biasanya EDA dilakukan dengan beberapa cara; *analisis deskriptif dengan satu variabel*, *analisis relasi dengan dua variabel*, dan *analisis dengan menggunakan lebih dari atau sama dengan tiga variabel.* 
+
+# Exploratory Data Analysis (EDA)
+Dalam EDA, secara sederhana ada 4 aktivitas yang akan dilakukan, yaitu: menyiapkan data, membersihkan data, Ekplorasi data, dan visualisasi data. Sebelum kita memulai 4 tahapan tersebut, ada beberapa library yang kita perlukan, yaitu `dplyr`, `lubridate` dan `ggplot2`
+
+```{r}
+# library yang digunakan untuk data wrangling
+library(dplyr)
+
+# library untuk visualisasi data
+library(ggplot2)
+
+# library untuk berkerja dengan date
+library(lubridate)
+```
+
+## Data Preparation
+Kita akan import dataset, dataset yang kita gunakan adalah **online_retail.csv**. Kita akan simpan data online retail tersebut kedalam sebuah objek *retail*
+
+```{r}
+retail <- read.csv("data/online_retail.csv")
+```
+
+Kita akan melihat struktur data dari objek retail dengan fungsi `str()` atau menggunakan fungsi `glimpse()`, fungsi ini merupakan fungsi yang ada pada packages `dplyr`baru kita panggil, dan fungsinya adalah untuk melihat struktur data.
+
+```{r}
+# melihat strukturdata dengan glimpse()
+glimpse(retail)
+```
+fungsi dan hasilnya hampir sama dengan fungsi `str()`
+
+```{r}
+str(retail)
+```
+
+Setelah kita melihat struktur data dari dataset, maka kita akan melihat ringkasan data, untuk melihat apakah ada data yang "Missing Value" atau **NA's**. Kita akan menggunakan fungsi `summary()`
+
+```{r}
+summary(retail)
+```
+Kalau kita lihat dari hasil diatas ternyata ada data NA's 66245. Sehingga kita harus membersihkan data ini. Untuk menyelesaikan ini, kita akan bahas pada bagian **Clean the Data**
+
+Untuk melihat data yang *missing value* atau NA's juga bisa menggunakan fungsi ini:
+```{r}
+colSums(is.na(retail))
+```
+
+
+## Clean the Data
+### Membersihkan data NA's
+Untuk membersihkan data NA's kita bisa menggunakan fungsi `na.omit()`
+
+```{r}
+retail <- na.omit(retail)
+summary(retail)
+```
+Nah kalau kita lihat data yang NA's sudah dihilangkan, sehingga data sudah bersih dan siap untuk dianalisis.
+
+```{r}
+colSums(is.na(retail))
+```
+
+
+```{r}
+glimpse(retail)
+```
+
+
+### Merubah type data
+Kalau kita perhatikan type data dari InvoiceDate bertype character, kalau kita ingin analisis, maka kita harus rubah type datanya menjadi date atau datetime.
+Untuk merubah type data kita bisa menggunakan fungsi `mdy()`, fungsi ini ada dalam `library lubridate` yang sebelumnya sudah kita install. Dalam kasus ini, kita juga menggunakan fungsi `mutate()` fungsi ini ada dalam `library dplyr`, fungsi ini gunanya  untuk membuat variabel baru yang diturunkan dari variabel yang sudah ada. Dalam kasus ini kita merubah variabel InvoiceDate dari type character ke variabel InvoiceDate dengan type data DateTime.
+
+Objek retail yang sudah dibersihkan kita simpan dalam objek *retailClean*.
+
+```{r}
+# Merubah type data InvoiceDate
+
+retailClean <- retail %>%  
+  mutate(InvoiceDate = mdy_hm(InvoiceDate)) %>% 
+  arrange(InvoiceDate)
+glimpse(retailClean)
+```
+
+Bisa kita lihat bahwa sekarang variabel *InvoiceDate* type datanya sudah berubah menjadi type *datetime (dttm)*
+
+**Keterangan:** Operator Pipeline atau %>% (dibaca piping) digunakan untuk merangkai beberapa fungsi dalam urutan operasi. Sehingga kita dapat menuliskan lebih dari satu fungsi sekaligus tanpa harus menyimpannya terlebih dahulu. Operator pipeline bisa dibuat dengan cepat menggunakan kombinasi **"ctrl + shift + m"**
+
+*Latihan Penggunaan Piping
+```{r}
+# your code
+%>% %>% %>% %>% %>% %>% %>% %>% %>% %>% 
+
+
+```
+
+
+## Ekplorasi Data
+Untuk Ekplorasi data atau prosesd data, bisa disesuaikan dengan kebutuhan. Untuk mendukung hal tersebut kita bisa menggunakan `library dplyr`. Berikut ini beberapa fungsi lain yang ada dalam dplyr yang bisa kita gunakan.
+
+### Filter
+Fungsi `filter()` digunakan untuk menyeleksi dan menampilkan data sesuai dengan kebutuhan. Misalnya kita ingin memfilter StockCode = 85123A. maka penulisan fungsi filter bisa dilakukan seperti ini. Hasil filter kita simpan dalam objek *stockcode85123A*
+
+```{r}
+stockcode85123A <- filter(retailClean, StockCode == "85123A")
+head(stockcode85123A)
+
+```
+Maka bisa dilihat bahwa, semua data akan ditampilkan hanya StockCode = 85123A
+
+```{r}
+head(retailClean)
+```
+```{r}
+tail(retailClean)
+```
+
+*Latihan*
+1. Gunakan fungsi filter untuk menyeleksi Country dari United Kingdom, dan simpan ke dalam objek CountryUK
+2. Gunakan fungsi filter untuk menyeleksi CustomerID = 168675, dan simpan ke dalam objek CusID168675
+
+```{r}
+# your code
+
+
+```
+
+
+Misalnya kita akan memfilter jumlah transaksi hanya dari asal negara United Kingdom pada StockCode 85123A, maka fungsi filter bisa tulis seperti ini.
+
+```{r}
+UK <- stockcode85123A %>% 
+  filter(Country == "United Kingdom")
+head(UK)
+```
+```{r}
+tail(UK)
+
+```
+
+
+
+*Latihan*
+1. seleksilah dalam data CusID168675, dengan stockcode = "85123A"
+2. seleksilah dalam data CusID168675, dengan decription = "WHITE HANGING HEART T-LIGHT HOLDER"
+
+```{r}
+# your code
+ 
+
+
+```
+
+
+### Count dan Group By
+Fungsi `count()` digunakan untuk mengetahui jumlah data berdasarkan kategori/variabel yang sudah ditentukan sebelumnya. Misalnya dalam kasus ini kita akan hitung jumlah transaksi berdasarkan variabel *Country* yang ada pada objek *stockcode85123A*
+
+```{r}
+count(stockcode85123A, Country)
+```
+
+```{r}
+count(stockcode85123A, Country) %>% 
+arrange(-n)
+```
+
+
+*Latihan*
+Gunakan fungsi `count` untuk menghitung jumlah:
+1. variabel country pada objek CusID168675
+2. variabel Description pada objek CusID168675
+
+```{r}
+# your code
+
+
+
+```
+
+
+### Group By dan Arrange
+Fungsi `group_by()`digunakan untuk mengelompokkan data berdasarkan satu atau lebih varibel. Fungsi `arrange()` digunakan untuk mengurutkan data berdasarkan variabel. Pengurutan bisa dilakukan dari kecil ke besar atau sebaliknya.
+Misalnya dalam kasus ini kita ingin mengelompokkan data berdasarkan variabel Country dan sekaligus menghitung jumlah transaksinya dan diurutkan dari besar ke kecil.
+
+```{r}
+stockcode85123A %>% 
+  group_by(Country) %>% 
+  count() %>% 
+  arrange(-n)
+```
+Bisa kita lihat negara yang paling banyak melakukan transaksi adalah United Kingdom yaitu sebanyak 1097 kali
+
+
+```{r}
+stockcode85123A %>% 
+  group_by(Country, CustomerID, InvoiceDate) %>% 
+  count() %>% 
+  arrange(-n)
+```
+
+
+Sekarang kita akan hitung berapa jumlah transaksi berdasarkan StockCode, maka bisa kita tuliskan seperti ini.
+
+```{r}
+retailClean %>% 
+  group_by(StockCode) %>% 
+  count() %>% 
+  arrange(-n)
+```
+Transaksi yang paling banyak adalah untuk StockCode 85123A sebanyak 1131.
+
+
+Contoh lain, bagaimana kita menghitung jumlah transaksi berdasarkan InvoiceNo.
+
+```{r}
+invoiceNoTrans <- retailClean %>% 
+  dplyr::group_by(InvoiceNo) %>% 
+  dplyr::count() %>% 
+  dplyr::arrange(-n)
+
+head(invoiceNoTrans)
+```
+Bisa dilihat bahwa InvoiceNo 547063 berisi sebanyak 294 transaksi.
+
+*Latihan*
+pada Objek retailClean:
+1. Gunakan `group_by`untuk menghitung jumlah transaksi berdasarkan CustomerID
+2. Gunakan `group_by`untuk menghitung jumlah transaksi berdasarkan Description
+
+pada Objek CusID168675:
+3. Gunakan `group_by` untuk menghitung jumlah transaksi berdasarkan Description 
+4. Gunakan `group_by` untuk menghitung jumlah transaksi berdasarkan Country
+
+```{r}
+# your code
+
+
+
+
+```
+
+
+### Sampling
+Fungsi `sample_n()` digunakan untuk mengambil secara acak data, artinya kita bisa mengambil sampel dari data secara acak. Misalnya kita ingin mengambil sebanyak 5 sampel data dari variabel Quantity pada objek UK.
+
+```{r}
+sample_n(UK, size = 10)
+```
+*Latihan*
+1. Gunakan fungsi `sample_n()` untuk mengambil 10 transaksi yang ada pada objek `retailClean`
+2. Gunakan fungsi `sample_n()` untuk mengambil 5 transaksi yang ada pada objek `stockcode85123A`
+```{r}
+# your code
+sample_n(retailClean, size = 100)
+
+
+```
+
+### Select
+Fungsi `select()` digunakan untuk mengambil satu atau beberapa variabel tertentu yang ada dalam dataset. Sebagai contoh disini kita akan mengambil variabel InvoiceNo, dan Quantity dan tampilkan hanya 6 data teratas.
+
+```{r}
+glimpse(UK)
+```
+
+
+```{r}
+head(select(UK, c(1,4))) 
+```
+
+```{r}
+head(select(UK, c(2,3)))
+```
+```{r}
+glimpse(stockcode85123A)
+```
+
+
+
+*Latihan*
+1. Gunakan fungsi `select()` untuk menampilkan data stockcode85123A pada kolom InvoiceDate dan CustomerID
+2. Gunakan fungsi `select()` untuk menampilkan data CusID168675 pada kolom InvoiceDate dan Country
+
+```{r}
+# your code
+tail(select(stockcode85123A, c(5,7)))
+
+```
+
+```{r}
+
+```
+
+
+### Summarise
+Fungsi `summarise()` digunakan untuk meringkas beberapa nilai data menjadi sebuah nilai. Dalam prakteknya fungsi ini akan sangat berguna kalau digabungkan dengan fungsi-fungsi yang lain. Sebagai contoh dalam kasus ini kita akan menampilkan jumlah traksaksi dari negara UK berdasarkan jumlah Quantity harian. Nilainya kita akan simpan pada objek *UK_daily_retail*
+
+```{r}
+UK_daily_retail <- UK %>% 
+  group_by(InvoiceDate) %>% 
+  summarise(
+    jmlTrans = sum (Quantity)
+  )
+head(arrange(UK_daily_retail, (-jmlTrans)))
+tail(arrange(UK_daily_retail, (-jmlTrans)))
+```
+Bisa dilihat bahwa traksaksi paling banyak ada pada tanggal 11-01-2011 dan 18-04-2011 sebanyak 1930 transaksi.
+
+*Latihan*
+gunakan fungsi `summarise()` untuk menampilkan jumlah Quantity berdasarkan StockCode pada objek CusID168675
+
+```{r}
+# your code
+
+
+
+```
+
+
+
+# Visualization Analysis
+Visualiasi analisis ini adalah bagaimana kita memvisualisasikan hasil Explanatory Data Analysis yang sudah kita lakukan sebelumnya. Dalam kasus ini kita akan memvisualisasikan dengan menggunakan `library ggplot2`
+
+Sebagai contoh kita akan memvisualisasikan hasil dari transaksi harian yang ada pada negara UK yang sebelumnya sudah kita simpan pada objek *UK_daily_retail*
+
+```{r}
+UK_daily_retail %>% 
+  ggplot(aes(x=InvoiceDate, y=jmlTrans)) +
+  geom_point() +
+  theme_minimal()
+```
+Contoh visualisasi lain yang dilengkapi dengan title dan subtitle
+
+
+```{r}
+UK_daily_retail %>% 
+  ggplot(aes(x=InvoiceDate, y=jmlTrans)) + 
+  geom_line(color = "tomato3") + 
+  labs( 
+    title = "Transaksi Harian", 
+    subtitle = "United Kingdom", 
+    caption = "by: Roni Yunis", 
+    x = "Bulan", 
+    y = "Jumlah" 
+  ) + 
+  theme_minimal()
+```
+Misalkan kita diminta untuk memvisualisasi transaksi berdasarkan InvoiceDate dan Quantity berdasarkan semua transaksi dengan StockCode = 85123A
+
+```{r}
+ggplot(stockcode85123A)+
+  aes(x=InvoiceDate, y=Quantity) + 
+  geom_point (colour = "green") +
+  labs( 
+    title = "Transaksi Harian", 
+    subtitle = "Stock Code 85123A", 
+    caption = "by: Roni Yunis", 
+    x = "Bulan", 
+    y = "Jumlah" 
+  ) + 
+theme_minimal()
+```
+
+```{r}
+ggplot(stockcode85123A)+
+  aes(x=InvoiceDate, y=Quantity) + 
+  geom_line (colour = "purple ") +
+  labs( 
+    title = "Transaksi Harian", 
+    subtitle = "Stock Code 85123A", 
+    caption = "by: Roni Yunis", 
+    x = "Bulan", 
+    y = "Jumlah" 
+  ) + 
+theme_minimal()
+```
+
+# Menentukan teknik pemodelan atau algaritma
+Secara umum ada 3 jenis model analisis bisnis yang dapat digunakan, yaitu: Analisis Deskriptif, Analisis Prediktif dan Analisis Preskriptif.
+
+## Analisis Prediftif
+Untuk melakukan analisis prediktif dapat menggunakan 2 (dua) metode yaitu:
+
+ 1. Classification: suatu bentuk dasar dari analisis data dimana data diklasifikasikan ke dalam kelas-kelas.
+ 2. Regression: memprediksi nilai variabel numerik — misalnya, angka pendapatan perusahaan atau angka penjualan
+ 
+## Machine Learning
+
+1. Supervised Machine Learning: 
+
+mesin membuat model prediktif di bawah pengawasan — yaitu, dengan bantuan kumpulan data pelatihan.
+
+2. Unsupervised Machine Learning: 
+
+tidak ada data pelatihan untuk dipelajari. Oleh karena itu, tidak ada variabel target untuk diprediksi. Aturan asosiasi dan pengelompokan adalah contoh pembelajaran tanpa pengawasan. Dalam pembelajaran tanpa pengawasan, semua pengamatan kumpulan data dimasukkan ke dalam pembelajaran, dan hasilnya bisa berupa kelompok atau asosiasi yang berbeda antara dua variabel. Karena tidak ada kelas hasil untuk diidentifikasi dengan sendirinya, analisis lebih lanjut diperlukan untuk memahami hasil model dengan benar.
+
+
+# Evaluasi model
+
+Mengevaluasi performa model adalah aspek kunci untuk memahami seberapa baik prediksi Anda saat menerapkan data baru. Dalam mengevaluasi model, data set dibagi menjadi tiga partisi yaitu:
+
+1. Training Data Partition: Partisi data pelatihan digunakan untuk melatih model. Rincian variabel hasil sudah diketahui. Untuk masalah klasifikasi, kelas variabel hasil sudah ditentukan dan terkadang dibuat secara manual dengan campur tangan manusia.
+2. Test Data Partitions: Partisi data pengujian adalah bagian dari kumpulan data yang tidak ada dalam kumpulan pelatihan. Ini digunakan untuk menilai kinerja model untuk data baru. Partisi ini terkadang disebut partisi pisahan. Model harus bekerja dengan baik untuk data set pelatihan dan data pengujian.
+3. Validation Data Partition: Partisi data validasi digunakan untuk menyempurnakan kinerja model dan mengurangi masalah overfitting. Partisi ini dapat digunakan untuk menilai beberapa model dan memilih model terbaik. Kumpulan data ini tidak digunakan untuk membangun model. Jadi, model tersebut belum pernah melihat kumpulan data ini sebelumnya. Ini membantu menyempurnakan kinerja model dan mengurangi overfitting.
+
+# Laporkan hasilnya kepada pihak manajemen
+Pada tahap mempresentasikan review dan laporan manajemen, model matematika yang kita pakai dijelaskan kepada pimpinan bisnis. Jika atasan senang dengan hasil dan model, maka model tersebut siap untuk diterapkan. Jika ada perubahan, maka siklus tersebut akan diulang. Poin-poin yang dibahas meliputi: Problem Description, Dataset Used, Data Cleaning, Method Used to Created the Model, Model Deployment, and Issue handling
+
+
+# Kembangkan model dan penerapannya
+Setelah teknik pemodelan dan algoritma ditentukan, langkah berikutnya adalah mengembangkan model dan menerapkannya. Keberhasilan dari penerapan model tergantung pada: 
+
+a.	Ukuran perangkat keras yang tepat, memastikan kinerja yang dibutuhkan
+
+b.	Pemrograman yang tepat untuk menangani kemampuan perangkat keras
+
+c.	Integrasi dan pembersihan data yang tepat
+
+d.	Laporan, dasbor, pandangan, keputusan, dan intervensi yang efektif untuk digunakan oleh pengguna akhir atau sistem pengguna akhir
+
+e.	Pelatihan yang efektif untuk pengguna model
+
+
+>>>>>>> 3216c2d0f95f55fd74c98186c72db7fba92467e3
