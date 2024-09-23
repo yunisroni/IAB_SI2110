@@ -22,7 +22,7 @@ knitr::include_graphics(path = "image/data.png")
 Untuk membaca data dengan format .csv pada R bisa menggunakan fungsi `read.csv()`.
 
 ```{r}
-retail <- read.csv("data/OnlineRetail.csv")
+retail <- read.csv("data/online_retail.csv")
 retail
 ```
 
