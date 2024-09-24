@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 ---
 title: "Modul 06 - Classification"
 author: "Roni Yunis"
@@ -726,4 +725,4 @@ Kalau kita bandingkan dari kedua model tersebut, kinerja dari klasifikasi dengan
 
 
 
->>>>>>> 3216c2d0f95f55fd74c98186c72db7fba92467e3
+
