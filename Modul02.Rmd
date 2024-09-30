@@ -2,13 +2,17 @@
 title: "Modul 02 - R for Data Analysis"
 author: "Roni Yunis"
 date: "17/09/2024"
-output: pdf_document
+output:
+  html_document:
+    df_print: paged
 ---
  
 # Membaca dataset
 
 Setelah memahami dasar dari pemerograman R seperti tipe dan struktur data, sekarang kita akan membahas bagaimana cara mengimport dan membaca dataset pada R. Import dataset pada R dapat dilakukan melalui 2 cara:
+
 1. Melalui melalui menu import dataset pada tab menu File.
+
 2. Melalui upload file pada panel file.
 
 Import dataset tergantung dari jenis format file dari dataset tersebut, ada yang berformat excel, csv, xlsx, dll. Dalam contoh ini kita sudah mengimport dataset pada folder data, dan bisa dilihat pada panel file yang menampung 3 buah dataset dengan format yang berbeda yaitu format: .csv, .xlsx dan .xls
@@ -29,6 +33,18 @@ retail
 
 setelah kita jalankan fungsi diatas maka nanti pada panel environment yang terbentuk sebuah data dengan nama *retail*
 
+*Latihan: Import dan baca dataset Diabetes.csv*
+
+```{r}
+library(readr)
+diabetes <- read_csv("data/diabetes.csv")
+diabetes
+```
+
+
+```{r}
+diabetes
+```
 ## data excel(.xls)/(.xlsx)
 
 Untuk membaca data dengan format excel atau .xls, dan .xlsx, kita harus menginstall sebuah packages yaitu "readxl", untuk install packages nanti akan dibahas pada bagian khusus dibawah.
@@ -94,12 +110,15 @@ head(retail)
 
 ```{r}
 # Menampilkan 3 data teratas
-head(retail, 17)
+head(retail, 3)
 ```
 
 *Latihan*
+
 1. Gunakan fungsi `head()` untuk menampilkan 6 data teratas dari objek `risk`
+
 2. Gunakan fungsi `head()` untuk menampikan 9 data teratas dari objek `sales`
+
 3. Gunakan fungsi `head()` untuk menampikan 15 data teratas dari objek `sales`
 
 ```{r}
@@ -111,6 +130,8 @@ head(risk)
 ```{r}
 head(sales, 9)
 ```
+
+
 ```{r}
 head(sales, 15)
 
@@ -149,7 +170,9 @@ tail(sales, 10)
 
 ```
 *Latihan*
+
 1. Gunakan fungsi `tail()` menampikan 6 data terbawah dari objek `risk`
+
 2. Gunakan fungsi `tail()` menampikan 26 data terbawah dari objek `risk`
 
 ```{r}
@@ -273,6 +296,8 @@ ggplot(risk)+
 ```{r}
 head(sales)
 ```
+
+
 ```{r}
 str(sales)
 ```
@@ -287,6 +312,7 @@ colnames(sales)[colnames(sales) == "Total Cost"] <- "TotalCost"
 colnames(sales)[colnames(sales) == "High Item"] <- "HighItem"
 str(sales)
 ```
+
 ```{r}
 ggplot(sales)+
   aes(x = Region, y = ItemsOrdered, colour = Gender) +
@@ -294,6 +320,7 @@ ggplot(sales)+
   theme_minimal() +
   scale_color_hue()
 ```
+
 ```{r}
 ggplot(sales)+
   aes(x = TotalCost, y = HighItem, colour = BuyCategory) +
@@ -301,9 +328,11 @@ ggplot(sales)+
   theme_minimal() +
   scale_color_hue()
 ```
+
 ```{r}
 barplot(sales$ItemsOrdered)
 ```
+
 ```{r}
 boxplot(sales$ItemsOrdered)
 ```
