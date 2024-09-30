@@ -2,7 +2,9 @@
 title: "Modul 01 - Introduction to R"
 author: "Roni Yunis"
 date: "17/09/2024"
-output: pdf_document
+output:
+  html_document:
+    df_print: paged
 ---
 
 # Instalasi R dan RStudio
@@ -114,6 +116,13 @@ kata `inteligensi` di atas disebut dengan **objek** yang menampung nilai yaitu "
 Jika Anda menjalankan chunk di atas, maka sekarang akan muncul objek `inteligensi` pada panel inveronment. Untuk memanggil objek yang sudah dibuat kita bisa menjalan chunk dibawah ini
 
 ```{r}
+a <- 2
+b <- 3
+c= a+b
+```
+
+
+```{r}
 inteligensi
 ```
 
@@ -121,6 +130,9 @@ Perlu diperhatikan bahwa R bahasa pemrograman yang *case sensitive* sehingga "An
 
 ```{r}
 inteligensi == "analitika Bisnis"
+```
+```{r}
+inteligensi == "Analitika Bisnis"
 ```
 
 *Latihan*
@@ -153,10 +165,16 @@ a_log <- c(TRUE, TRUE, FALSE)
 
 Keterangan: c() adalah fungsi untuk membuat vector
 
+```{r}
+a_char
+```
+
+
+
 Sebagai contoh Anda diminta untuk membuat sebuah objek `orang` yang berisi 3 nama teman Anda. Maka code nya bisa dibuat seperti ini:
 
 ```{r}
-orang <- c("Roni", "Joosten", "Yunis")
+orang <- c("Katanya", "Fufufafa", "Bohong")
 ```
 
 Cara mengetahui type data dari suatu objek, Anda dapat menggunakan fungsi `class()`. Codenya seperti ini:
@@ -182,7 +200,7 @@ class(harga)
 bagaimana kalau dalam sebuah vector terdiri dari beberapa type data yang berbeda seperti chunk dibawah ini, apa yang terjadi? coba Anda periksa.
 
 ```{r}
-campur <- c("Aisyah", 2020, 46L, TRUE)
+campur <- c("Aisyah", 2020, 46L, TRUE, 3*2i)
 campur
 ```
 
@@ -235,6 +253,13 @@ mat
 
 Perhatikan bagaimana nilai dalam sebuah `matrix` terisi; `matrix` akan terisi secara baris terlebih dahulu karena parameter `byrow` yang bernilai `FALSE` secara _default_. Nilai dalam sebuah `matrix` akan terisi dari indeks `[1, 1]` dapat dibaca sebagai `[row index, column index]` yang merupakan nilai paling kiri atas.
 
+```{r}
+nilai <- matrix(11:22, nrow = 3, ncol = 4)
+nilai
+
+```
+
+
 ### List
 
 Dalam `vector` dan `matrix`, kita hanya bisa menggunakan elemen-elemen dengan tipe data yang sama. Jika kita ingin menyimpan beberapa data dengan tipe data yang berbeda, kita bisa menggunakan struktur data `list`:
@@ -249,7 +274,9 @@ ketika melakukan subset pada list menggunakan [] itu berarti kita mengakses *nil
 
 ```{r}
 class(our_list[[3]]) 
+
 ```
+
 ```{r}
 class(our_list[[4]])
 ```
@@ -257,10 +284,11 @@ class(our_list[[4]])
 
 
 *latihan:* 
-coba akses `our_list` pada index ke 4 dan cek tipe datanya menggunakan fungsi `class()`
+coba akses `our_list` pada index ke 2 dan cek tipe datanya menggunakan fungsi `class()`
 
 ```{r}
 our_list[[2]]
+
 class(our_list[[2]])
 
 ```
@@ -277,6 +305,29 @@ Untuk mengakses _vector_ yang ada di dalamnya, maka kita bisa menggunakan `[[]]`
 ```{r}
 class(our_list[[3]])
 ```
+```{r}
+class(our_list[[1]])
+```
+*Latihan*
+buatlah sebuah list yang berisikan nilai sebagai berikut:
+
+- c("Universitas","Mikroskil", "Umurnya", 27, "Tahun", 20212, c(TRUE,FALSE))
+
+simpan ke dalam objek dengan nama: mikroskil
+
+```{r}
+mikroskil <- list(c("Universitas","Mikroskil"), "Umurnya", 27, "Tahun", 20212, c(TRUE,FALSE))
+
+mikroskil
+
+```
+
+```{r}
+class(mikroskil)
+```
+```{r}
+class(mikroskil[[6]])
+```
 
 ### Data Frame
 
@@ -292,8 +343,6 @@ daftar_buah <- data.frame(
 
 daftar_buah
 ```
-
-
 *latihan:* 
 buat dataframe yang berisi 3 kolom dan simpan kedalam object `karyawan` 
 
@@ -336,6 +385,19 @@ mahasiswa <- data.frame(
 mahasiswa
 ```
 
+*Latihan 2*
+
+buatlah data frame dari daftar nilai/KHS anda:
+Kode, Nama Mata Kuliah, Nilai Angka, Nilai Huruf
+
+```{r}
+# your code
+
+
+
+```
+
+Jika kita menggunakan stringsAsFactors = FALSE, R akan memastikan bahwa kolom-kolom string tetap dalam tipe data character dan tidak diubah menjadi factor
 
 
 Gambaran dari rangkuman keempat struktur data yang sudah kita bahas di atas, dapat diilustrasikan seperti gambar di bawah ini:
