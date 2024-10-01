@@ -45,6 +45,7 @@ diabetes
 ```{r}
 diabetes
 ```
+
 ## data excel(.xls)/(.xlsx)
 
 Untuk membaca data dengan format excel atau .xls, dan .xlsx, kita harus menginstall sebuah packages yaitu "readxl", untuk install packages nanti akan dibahas pada bagian khusus dibawah.
@@ -99,6 +100,17 @@ str(risk)
 ```{r}
 str(sales)
 ```
+*Latihan*
+gunakan fungsi `str()` untuk melihat struktur data dari objek `diabetes`
+
+```{r}
+# your code
+
+
+
+```
+
+
 
 ## Head()
 
@@ -110,7 +122,7 @@ head(retail)
 
 ```{r}
 # Menampilkan 3 data teratas
-head(retail,9)
+head(retail,3)
 ```
 
 *Latihan*
@@ -119,7 +131,7 @@ head(retail,9)
 
 2. Gunakan fungsi `head()` untuk menampikan 9 data teratas dari objek `sales`
 
-3. Gunakan fungsi `head()` untuk menampikan 15 data teratas dari objek `sales`
+3. Gunakan fungsi `head()` untuk menampikan 15 data teratas dari objek `diabetes`
 
 ```{r}
 # your code
@@ -133,7 +145,7 @@ head(sales, 9)
 
 
 ```{r}
-head(sales, 15)
+head(sales, 25)
 
 ```
 
@@ -145,10 +157,13 @@ head(retail, 10)
 ```
 
 *Latihan*
-Cobalah Anda tampilkan 15 data teratas dari objek *retail* dengan fungsi `head()`
+Cobalah Anda tampilkan 15 data teratas dari objek *diabetes* dengan fungsi `head()`
 
 ```{r}
 #your code
+
+
+
 
 ```
 
@@ -206,6 +221,8 @@ summary(risk)
 summary(sales)
 ```
 
+*Latihan*
+gunakan fungsi `summary()` untuk melihat ringkasan data `diabetes`
 
 ```{r}
 summary(diabetes)
@@ -249,18 +266,29 @@ library(ggplot2)
 library(dplyr)
 ```
 
+
 ```{r}
 head(retail)
 ```
 
 
 Contoh penggunaan _library ggplot2_
+
 ```{r}
 ggplot(retail) +
   aes(x = Country) +
   geom_bar() + # grafik batang
+  theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  
 
+```
+```{r}
+ggplot(retail) +
+  aes(x = CustomerID) +
+  geom_bar() + # grafik batang
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
 ```{r}
@@ -277,9 +305,36 @@ ggplot(risk) +
   geom_bar() +
   theme_minimal()
 ```
+```{r}
+ggplot(risk) +
+  aes(x = Housing) +
+  geom_bar() +
+  theme_minimal()
+```
+
+*Latihan*
+1. buatlah grafik dengan `geom_bar()` untuk menampilkan variabel `Job` dari objek `risk`
+
+```{r}
+# your code
+
+
+
+```
+
+2. buatlah grafik dengan `geom_bar()` untuk menampilkan varibel `MaritalStatus` dari objek `risk`
+
+```{r}
+# your code
+
+
+
+```
+
+
 library `dplyr` atau library untuk manipulasi data
 
-fungsi str() untuk melihat struktur data
+fungsi str() untuk melihat struktur data. dengan dplyr untuk melihat struktur data kita menggunakan fungsi `glimpse()`
 
 ```{r}
 glimpse(risk)
@@ -299,12 +354,17 @@ ggplot(risk)+
   scale_color_hue()
 ```
 
+```{r}
+ggplot(risk)+
+  aes(x = Age, y = MonthsCustomer, colour = Gender) +
+  geom_point() + #grafik titik
+  theme_minimal() +
+  scale_color_hue()
+```
 
 ```{r}
 head(sales)
 ```
-
-
 
 ```{r}
 head(risk)
@@ -318,6 +378,15 @@ ggplot(risk)+
   theme_minimal() +
   scale_color_hue()
 ```
+```{r}
+ggplot(risk)+
+  aes(x = MaritalStatus, y = Checking, colour = Gender) +
+  geom_boxplot() +
+  theme_minimal() +
+  scale_color_hue()
+```
+
+
 
 ```{r}
 head(sales)
@@ -325,7 +394,7 @@ head(sales)
 
 
 ```{r}
-str(sales)
+glimpse(sales)
 ```
 
 
@@ -353,11 +422,14 @@ ggplot(sales)+
 
 ```{r}
 ggplot(sales)+
-  aes(x = TotalCost, y = HighItem, colour = BuyCategory) +
+  aes(x = TotalCost, y = HighItem) +
   geom_line() +
   theme_minimal() +
   scale_color_hue()
 ```
+
+
+Berikut ini, grafik defult yang ada dalam R
 
 ```{r}
 barplot(sales$ItemsOrdered)
@@ -365,6 +437,10 @@ barplot(sales$ItemsOrdered)
 
 ```{r}
 boxplot(sales$ItemsOrdered)
+```
+
+```{r}
+boxplot(risk$Years)
 ```
 
 
