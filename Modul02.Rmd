@@ -89,6 +89,7 @@ kalau fungsi `str(retail)` tersebut kita jalankan, maka akan memperlihat struktu
 
 *Latihan*
 GUnakalah fungsi `str()` untuk melihat struktur data dari objek `risk` dan `sales`
+
 ```{r}
 # your code
 str(risk)
@@ -98,7 +99,6 @@ str(risk)
 ```{r}
 str(sales)
 ```
-
 
 ## Head()
 
@@ -110,7 +110,7 @@ head(retail)
 
 ```{r}
 # Menampilkan 3 data teratas
-head(retail, 3)
+head(retail,9)
 ```
 
 *Latihan*
@@ -145,7 +145,7 @@ head(retail, 10)
 ```
 
 *Latihan*
-Cobalah Anda tampilkan 15 data teratas dari objek *sales* dengan fungsi `head()`
+Cobalah Anda tampilkan 15 data teratas dari objek *retail* dengan fungsi `head()`
 
 ```{r}
 #your code
@@ -180,6 +180,8 @@ tail(sales, 10)
 tail(risk)
 
 ```
+
+
 ```{r}
 tail(risk, 26)
 ```
@@ -199,8 +201,14 @@ Gunakan fungsi `summary()` untuk melihat ringkasan dari data pada objek `risk` d
 summary(risk)
 
 ```
+
 ```{r}
 summary(sales)
+```
+
+
+```{r}
+summary(diabetes)
 ```
 
 
@@ -258,14 +266,30 @@ ggplot(retail) +
 ```{r}
 str(risk)
 ```
+```{r}
+head(risk)
+```
 
 
 ```{r}
 ggplot(risk) +
   aes(x = Gender) +
-  geom_bar() +  
+  geom_bar() +
   theme_minimal()
 ```
+library `dplyr` atau library untuk manipulasi data
+
+fungsi str() untuk melihat struktur data
+
+```{r}
+glimpse(risk)
+```
+
+```{r}
+head(risk)
+```
+
+
 
 ```{r}
 ggplot(risk)+
@@ -274,6 +298,8 @@ ggplot(risk)+
   theme_minimal() +
   scale_color_hue()
 ```
+
+
 ```{r}
 head(sales)
 ```
@@ -281,7 +307,7 @@ head(sales)
 
 
 ```{r}
-str(risk)
+head(risk)
 ```
 
 
@@ -310,8 +336,12 @@ colnames(sales)[colnames(sales) == "Card Type"] <- "CardType"
 colnames(sales)[colnames(sales) == "Buy Category"] <- "BuyCategory"
 colnames(sales)[colnames(sales) == "Total Cost"] <- "TotalCost"
 colnames(sales)[colnames(sales) == "High Item"] <- "HighItem"
-str(sales)
+glimpse(sales)
 ```
+```{r}
+head(sales)
+```
+
 
 ```{r}
 ggplot(sales)+
