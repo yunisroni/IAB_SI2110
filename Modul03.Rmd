@@ -32,7 +32,18 @@ str(asuransi)
 
 ```
 
+```{r}
+library (dplyr)
+glimpse(asuransi)
+```
+
 Dari data insurance.csv, bisa kita lihat bahwa data terdiri dari 1338 baris observasi dan 7 buah variabel. Untuk contoh kali kita akan menggunakan satu atau dua dari 4 buah variabel dengan type data numerik/integer yaitu **age**, **charges**, **bmi**, dan **children** yang nantinya akan dianalisis dengan pendekatan deskriptif.
+
+```{r}
+# untuk melihat parameter statistik dalam data
+summary(asuransi)
+```
+
 
 ## Minimum dan Maximum
 Untuk minimum dan maximum kita bisa menggunakan fungsi `min()` dan `max()`:
@@ -53,13 +64,17 @@ Bisa dilihat bahwa nilai minimum dari umur adalah 18 dan nilai maximum adalah 64
 
 ```{r}
 # your code
-
+min(asuransi$children)
+max(asuransi$children)
 
 
 ```
-
-
+```{r}
+min(asuransi$bmi)
+max(asuransi$bmi)
+```
 Hitunglah berapa nilai `charges` paling kecil dan paling besar?
+
 ```{r}
 # Melihat nilai charges paling kecil
 min(asuransi$charges)
@@ -83,11 +98,11 @@ range(asuransi$age)
 
 ```{r}
 # your code
+range(asuransi$children)
+range(asuransi$bmi)
 
 
 ```
-
-
 hitunglah range dari variabel `charges`
 ```{r}
 range(asuransi$charges)
@@ -99,8 +114,9 @@ range dari variabel charges adalah 1121.874 - 63770.428
 Fungsi selanjutnya adalah `mean()` yang digunakan untuk melihat nilai rata-rata.
 
 ```{r}
-rata <- mean(asuransi$age)
-rata
+rata_umur <- mean(asuransi$age)
+rata_umur
+
 ```
 Jadi umur rata-rata adalah 39.20703
 
@@ -110,15 +126,17 @@ Jadi umur rata-rata adalah 39.20703
 
 ```{r}
 # your code
-
+rata_children <- mean(asuransi$children)
+rata_children
 
 ```
-
-
+```{r}
+mean(asuransi$charges)
+```
 
 ```{r}
-mean <- mean(asuransi$bmi)
-mean
+mean_bmi <- mean(asuransi$bmi)
+mean_bmi
 ```
 
 Kalau ada dalam data kita data *missing value (NA)*, maka fungsi `mean(asuransi$age, na.rm = TRUE)` bisa kita gunakan, artinya data NA itu tidak termasuk dalam rata-rata yang kita cari.
@@ -149,7 +167,16 @@ Jadi nilai tengah atau median dari umur adalah 39
 
 ```{r}
 # your code
+median(asuransi$children)
 
+```
+```{r}
+# your code
+
+```
+
+```{r}
+# your code
 
 ```
 
@@ -178,10 +205,18 @@ quantile(asuransi$age, 0.75)
 
 ```{r}
 # your code
-
+quantile(asuransi$children, 0.75)
 
 ```
-
+```{r}
+quantile(asuransi$children, 0.5)
+```
+```{r}
+quantile(asuransi$children, 0.25)
+```
+```{r}
+boxplot(asuransi$children)
+```
 
 
 ## Standar Deviasi dan Variance
@@ -205,7 +240,12 @@ var
 
 ```{r}
 # your code
+sd(asuransi$children)
+var(asuransi$children)
 
+```
+```{r}
+# your code
 
 ```
 
@@ -313,6 +353,7 @@ prop.table(table(asuransi$sex, asuransi$smoker))
 ```
 
 Hutunglah hubungan sex dengan region, dan berapa nilai proporsi dari hubungan tersebut?
+
 ```{r}
 # nilai frekuensi hubungan antara bmi dengan charger
 sex_region <- table(asuransi$sex, asuransi$region)
@@ -366,6 +407,7 @@ descr(asuransi,
       heading = TRUE,
       stats = "common")
 ```
+
 ```{r}
 descr(asuransi)
 ```
@@ -446,7 +488,10 @@ library(ggplot2)
 Berikut ini adalah contoh bagaimana histogram dengan fungsi `geom_histogram()` pada `ggplot2`
 
 ```{r}
-ggplot(asuransi, aes(x = charges))+ geom_histogram()
+ggplot(asuransi, 
+       aes(x = charges)) + 
+  geom_histogram() +
+  theme_minimal()
 ```
 
 ### Barplot
