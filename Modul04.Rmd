@@ -2,7 +2,9 @@
 title: "Modul 04 - Business Analytics Process and Data Exploration"
 author: "Roni Yunis"
 date: "17/09/2024"
-output: pdf_document
+output:
+  html_document:
+    df_print: paged
 ---
 
 ```{r setup, include=FALSE}
@@ -81,18 +83,18 @@ colSums(is.na(retail))
 Untuk membersihkan data NA's kita bisa menggunakan fungsi `na.omit()`
 
 ```{r}
-retail <- na.omit(retail)
-summary(retail)
+retail_new <- na.omit(retail)
+summary(retail_new)
 ```
 Nah kalau kita lihat data yang NA's sudah dihilangkan, sehingga data sudah bersih dan siap untuk dianalisis.
 
 ```{r}
-colSums(is.na(retail))
+colSums(is.na(retail_new))
 ```
 
 
 ```{r}
-glimpse(retail)
+glimpse(retail_new)
 ```
 
 
@@ -105,7 +107,7 @@ Objek retail yang sudah dibersihkan kita simpan dalam objek *retailClean*.
 ```{r}
 # Merubah type data InvoiceDate
 
-retailClean <- retail %>%  
+retailClean <- retail_new %>%   
   mutate(InvoiceDate = mdy_hm(InvoiceDate)) %>% 
   arrange(InvoiceDate)
 glimpse(retailClean)
@@ -118,7 +120,7 @@ Bisa kita lihat bahwa sekarang variabel *InvoiceDate* type datanya sudah berubah
 *Latihan Penggunaan Piping
 ```{r}
 # your code
-%>% %>% %>% %>% %>% %>% %>% %>% %>% %>% 
+
 
 
 ```
@@ -138,20 +140,34 @@ head(stockcode85123A)
 Maka bisa dilihat bahwa, semua data akan ditampilkan hanya StockCode = 85123A
 
 ```{r}
-head(retailClean)
-```
-```{r}
-tail(retailClean)
+tail(stockcode85123A)
+
+
 ```
 
+
+```{r}
+glimpse(stockcode85123A)
+```
 *Latihan*
 1. Gunakan fungsi filter untuk menyeleksi Country dari United Kingdom, dan simpan ke dalam objek CountryUK
-2. Gunakan fungsi filter untuk menyeleksi CustomerID = 168675, dan simpan ke dalam objek CusID168675
+
 
 ```{r}
 # your code
+CountryUK <- filter(retailClean, Country == "United Kingdom")
 
+```
 
+```{r}
+glimpse(CountryUK)
+```
+
+2. Gunakan fungsi filter untuk menyeleksi CustomerID = 17850, dan simpan ke dalam objek CusID168675
+
+```{r}
+CusID17850 <- filter(retailClean, CustomerID == 17850)
+glimpse(CusID17850)
 ```
 
 
@@ -162,16 +178,15 @@ UK <- stockcode85123A %>%
   filter(Country == "United Kingdom")
 head(UK)
 ```
+
+
 ```{r}
 tail(UK)
 
 ```
-
-
-
 *Latihan*
-1. seleksilah dalam data CusID168675, dengan stockcode = "85123A"
-2. seleksilah dalam data CusID168675, dengan decription = "WHITE HANGING HEART T-LIGHT HOLDER"
+1. seleksilah dalam data CusID17850, dengan stockcode = "85123A"
+2. seleksilah dalam data CusID17850, dengan decription = "WHITE HANGING HEART T-LIGHT HOLDER"
 
 ```{r}
 # your code
@@ -196,8 +211,8 @@ arrange(-n)
 
 *Latihan*
 Gunakan fungsi `count` untuk menghitung jumlah:
-1. variabel country pada objek CusID168675
-2. variabel Description pada objek CusID168675
+1. variabel country pada objek CusID17850
+2. variabel Description pada objek CusID17850
 
 ```{r}
 # your code
@@ -215,7 +230,9 @@ Misalnya dalam kasus ini kita ingin mengelompokkan data berdasarkan variabel Cou
 stockcode85123A %>% 
   group_by(Country) %>% 
   count() %>% 
-  arrange(-n)
+  arrange(-n) 
+  
+
 ```
 Bisa kita lihat negara yang paling banyak melakukan transaksi adalah United Kingdom yaitu sebanyak 1097 kali
 
@@ -243,20 +260,24 @@ Contoh lain, bagaimana kita menghitung jumlah transaksi berdasarkan InvoiceNo.
 
 ```{r}
 invoiceNoTrans <- retailClean %>% 
-  dplyr::group_by(InvoiceNo) %>% 
-  dplyr::count() %>% 
-  dplyr::arrange(-n)
+  group_by(InvoiceNo) %>% 
+  count() %>% 
+  arrange(-n)
 
 head(invoiceNoTrans)
 ```
 Bisa dilihat bahwa InvoiceNo 547063 berisi sebanyak 294 transaksi.
+
+```{r}
+glimpse(invoiceNoTrans)
+```
 
 *Latihan*
 pada Objek retailClean:
 1. Gunakan `group_by`untuk menghitung jumlah transaksi berdasarkan CustomerID
 2. Gunakan `group_by`untuk menghitung jumlah transaksi berdasarkan Description
 
-pada Objek CusID168675:
+pada Objek CusID17850:
 3. Gunakan `group_by` untuk menghitung jumlah transaksi berdasarkan Description 
 4. Gunakan `group_by` untuk menghitung jumlah transaksi berdasarkan Country
 
@@ -273,17 +294,26 @@ pada Objek CusID168675:
 Fungsi `sample_n()` digunakan untuk mengambil secara acak data, artinya kita bisa mengambil sampel dari data secara acak. Misalnya kita ingin mengambil sebanyak 5 sampel data dari variabel Quantity pada objek UK.
 
 ```{r}
-sample_n(UK, size = 10)
+sample <- sample_n(UK, size = 200)
 ```
+
+
+
 *Latihan*
 1. Gunakan fungsi `sample_n()` untuk mengambil 10 transaksi yang ada pada objek `retailClean`
 2. Gunakan fungsi `sample_n()` untuk mengambil 5 transaksi yang ada pada objek `stockcode85123A`
+
+
 ```{r}
 # your code
-sample_n(retailClean, size = 100)
+sample_n(retailClean, size = 10)
 
 
 ```
+```{r}
+sample_n(stockcode85123A, size = 5)
+```
+
 
 ### Select
 Fungsi `select()` digunakan untuk mengambil satu atau beberapa variabel tertentu yang ada dalam dataset. Sebagai contoh disini kita akan mengambil variabel InvoiceNo, dan Quantity dan tampilkan hanya 6 data teratas.
@@ -294,29 +324,41 @@ glimpse(UK)
 
 
 ```{r}
-head(select(UK, c(1,4))) 
+head(select(UK, c(1,4)))
 ```
+Ambil data dari kolom invoiceno dan unitprice dari objek UK
+
+```{r}
+head(select(UK, c(1, 6)))
+```
+```{r}
+tail(select(UK, c(1,6)))
+```
+
+
+
 
 ```{r}
 head(select(UK, c(2,3)))
 ```
+
+
+
 ```{r}
 glimpse(stockcode85123A)
 ```
 
-
-
 *Latihan*
 1. Gunakan fungsi `select()` untuk menampilkan data stockcode85123A pada kolom InvoiceDate dan CustomerID
-2. Gunakan fungsi `select()` untuk menampilkan data CusID168675 pada kolom InvoiceDate dan Country
 
 ```{r}
 # your code
-tail(select(stockcode85123A, c(5,7)))
+head(select(stockcode85123A, c(5,7)))
 
 ```
-
+2. Gunakan fungsi `select()` untuk menampilkan data CusID17850 pada kolom InvoiceDate dan Country
 ```{r}
+# your code
 
 ```
 
@@ -336,7 +378,7 @@ tail(arrange(UK_daily_retail, (-jmlTrans)))
 Bisa dilihat bahwa traksaksi paling banyak ada pada tanggal 11-01-2011 dan 18-04-2011 sebanyak 1930 transaksi.
 
 *Latihan*
-gunakan fungsi `summarise()` untuk menampilkan jumlah Quantity berdasarkan StockCode pada objek CusID168675
+gunakan fungsi `summarise()` untuk menampilkan jumlah Quantity berdasarkan StockCode pada objek CusID17850
 
 ```{r}
 # your code
@@ -364,7 +406,7 @@ Contoh visualisasi lain yang dilengkapi dengan title dan subtitle
 ```{r}
 UK_daily_retail %>% 
   ggplot(aes(x=InvoiceDate, y=jmlTrans)) + 
-  geom_line(color = "tomato3") + 
+  geom_line(color = "blue") + 
   labs( 
     title = "Transaksi Harian", 
     subtitle = "United Kingdom", 
@@ -377,9 +419,14 @@ UK_daily_retail %>%
 Misalkan kita diminta untuk memvisualisasi transaksi berdasarkan InvoiceDate dan Quantity berdasarkan semua transaksi dengan StockCode = 85123A
 
 ```{r}
+head(stockcode85123A)
+```
+
+
+```{r}
 ggplot(stockcode85123A)+
   aes(x=InvoiceDate, y=Quantity) + 
-  geom_point (colour = "green") +
+  geom_point (colour = "tomato") +
   labs( 
     title = "Transaksi Harian", 
     subtitle = "Stock Code 85123A", 
