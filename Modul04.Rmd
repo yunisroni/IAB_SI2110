@@ -12,7 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 # Pengantar
-Dalam pembahasan kali ini, kita akan membahas secara umum proses analisis bisnis dan kaitannya dengan ekplorasi data. Tujuan dari analitika bisnis adalah untuk mendapatkan informasi dari data sehingga dapat membuat keputusan binis yang tepat. Dalam proses analisis bisnis ada beberapa tahapan yang harus dilalui yaitu:
+Dalam pembahasan kali ini, kita akan membahas secara umum proses analisis bisnis dan kaitannya dengan ekplorasi data. Tujuan dari analitika bisnis adalah untuk mendapatkan informasi dari data sehingga dapat membuat keputusan bisnis yang tepat. Dalam proses analisis bisnis ada beberapa tahapan yang harus dilalui yaitu:
 
 1. Memahami masalah bisnis
 
@@ -112,7 +112,6 @@ retailClean <- retail_new %>%
   arrange(InvoiceDate)
 glimpse(retailClean)
 ```
-
 Bisa kita lihat bahwa sekarang variabel *InvoiceDate* type datanya sudah berubah menjadi type *datetime (dttm)*
 
 **Keterangan:** Operator Pipeline atau %>% (dibaca piping) digunakan untuk merangkai beberapa fungsi dalam urutan operasi. Sehingga kita dapat menuliskan lebih dari satu fungsi sekaligus tanpa harus menyimpannya terlebih dahulu. Operator pipeline bisa dibuat dengan cepat menggunakan kombinasi **"ctrl + shift + m"**
@@ -163,7 +162,7 @@ CountryUK <- filter(retailClean, Country == "United Kingdom")
 glimpse(CountryUK)
 ```
 
-2. Gunakan fungsi filter untuk menyeleksi CustomerID = 17850, dan simpan ke dalam objek CusID168675
+2. Gunakan fungsi filter untuk menyeleksi CustomerID = 17850, dan simpan ke dalam objek CusID17850
 
 ```{r}
 CusID17850 <- filter(retailClean, CustomerID == 17850)
@@ -184,13 +183,22 @@ head(UK)
 tail(UK)
 
 ```
+```{r}
+glimpse(UK)
+```
 *Latihan*
 1. seleksilah dalam data CusID17850, dengan stockcode = "85123A"
 2. seleksilah dalam data CusID17850, dengan decription = "WHITE HANGING HEART T-LIGHT HOLDER"
 
 ```{r}
-# your code
+# 1. your code
  
+
+
+```
+
+```{r}
+# 2. your code
 
 
 ```
@@ -204,8 +212,9 @@ count(stockcode85123A, Country)
 ```
 
 ```{r}
-count(stockcode85123A, Country) %>% 
-arrange(-n)
+count(stockcode85123A, Country) %>%
+  arrange(-n)
+  
 ```
 
 
@@ -215,7 +224,14 @@ Gunakan fungsi `count` untuk menghitung jumlah:
 2. variabel Description pada objek CusID17850
 
 ```{r}
-# your code
+# 1. your code
+
+
+
+```
+
+```{r}
+# 2. your code
 
 
 
@@ -260,7 +276,7 @@ Contoh lain, bagaimana kita menghitung jumlah transaksi berdasarkan InvoiceNo.
 
 ```{r}
 invoiceNoTrans <- retailClean %>% 
-  group_by(InvoiceNo) %>% 
+  group_by(InvoiceNo, CustomerID, InvoiceDate) %>% 
   count() %>% 
   arrange(-n)
 
@@ -297,6 +313,9 @@ Fungsi `sample_n()` digunakan untuk mengambil secara acak data, artinya kita bis
 sample <- sample_n(UK, size = 200)
 ```
 
+```{r}
+head(sample)
+```
 
 
 *Latihan*
@@ -335,14 +354,9 @@ head(select(UK, c(1, 6)))
 tail(select(UK, c(1,6)))
 ```
 
-
-
-
 ```{r}
 head(select(UK, c(2,3)))
 ```
-
-
 
 ```{r}
 glimpse(stockcode85123A)
@@ -357,8 +371,15 @@ head(select(stockcode85123A, c(5,7)))
 
 ```
 2. Gunakan fungsi `select()` untuk menampilkan data CusID17850 pada kolom InvoiceDate dan Country
+
+```{r}
+glimpse(CusID17850)
+```
+
 ```{r}
 # your code
+head(select(CusID17850, c(5,8)))
+
 
 ```
 
@@ -373,7 +394,7 @@ UK_daily_retail <- UK %>%
     jmlTrans = sum (Quantity)
   )
 head(arrange(UK_daily_retail, (-jmlTrans)))
-tail(arrange(UK_daily_retail, (-jmlTrans)))
+#tail(arrange(UK_daily_retail, (-jmlTrans)))
 ```
 Bisa dilihat bahwa traksaksi paling banyak ada pada tanggal 11-01-2011 dan 18-04-2011 sebanyak 1930 transaksi.
 
@@ -383,7 +404,60 @@ gunakan fungsi `summarise()` untuk menampilkan jumlah Quantity berdasarkan Stock
 ```{r}
 # your code
 
+Quantity_StockCode <- CusID17850 %>% 
+  group_by(StockCode) %>% 
+  summarise(
+    jmlTrans = sum (Quantity)
+  )
 
+head(arrange(Quantity_StockCode,(-jmlTrans)))
+
+```
+```{r}
+glimpse(Quantity_StockCode)
+```
+```{r}
+tail(arrange(Quantity_StockCode,(-jmlTrans)))
+```
+*Latihan*
+Gunakan objek `retailClean`, dan hitunglah jumlah transaksi (Quantity) berdasarkan CustomerID dan Description
+
+```{r}
+# 1. jumlah quantity berdasarkan customerID
+Quantity_CusID <- retailClean %>% 
+  group_by(CustomerID) %>% 
+  summarise(
+    jmlTrans = sum (Quantity)
+  )
+
+head(arrange(Quantity_CusID,(-jmlTrans)))
+
+
+```
+
+
+```{r}
+# 2. jumlah quantity berdasarakan Description
+Quantity_Desc <- retailClean %>% 
+  group_by(Description) %>% 
+  summarise(
+    jmlTrans = sum (Quantity)
+  )
+
+head(arrange(Quantity_Desc,(-jmlTrans)))
+
+
+
+```
+```{r}
+# 2. jumlah quantity berdasarakan StockCode
+Quantity_All <- retailClean %>% 
+  group_by(InvoiceDate) %>% 
+  summarise(
+    jmlTrans = sum (Quantity)
+  )
+
+head(arrange(Quantity_All,(-jmlTrans)))
 
 ```
 
@@ -406,7 +480,7 @@ Contoh visualisasi lain yang dilengkapi dengan title dan subtitle
 ```{r}
 UK_daily_retail %>% 
   ggplot(aes(x=InvoiceDate, y=jmlTrans)) + 
-  geom_line(color = "blue") + 
+  geom_point(color = "blue") + 
   labs( 
     title = "Transaksi Harian", 
     subtitle = "United Kingdom", 

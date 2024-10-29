@@ -1,0 +1,236 @@
+---
+title: "Modul Klasifikasi - SVM"
+author: "Roni Yunis"
+date: "2024-10-22"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+**Support Vector Machine (SVM)** adalah sebuah algoritma machine learning yang digunakan untuk tugas klasifikasi dan regresi. Ini adalah model prediktif yang efektif dan dapat digunakan baik untuk data terstruktur maupun tidak terstruktur. Berikut adalah penjelasan detil tentang SVM:
+
+1. **Tujuan Utama:**
+   - **Klasifikasi:** SVM digunakan untuk memisahkan instance data ke dalam kelas-kelas yang berbeda.
+   - **Regresi:** SVM juga dapat diterapkan untuk tugas regresi, memprediksi nilai kontinu.
+
+2. **Prinsip Dasar:**
+   - SVM berusaha untuk menemukan hyperplane terbaik yang memisahkan dua kelas dalam ruang fitur.
+   - Hyperplane ini dipilih sedemikian rupa sehingga jarak antara hyperplane dan titik-titik terdekat dari kedua kelas, yang disebut support vectors maksimum.
+   
+   Hyperplane adalah konsep dalam geometri yang merujuk pada ruang pemisahan linear antara dua ruang. Dalam konteks Support Vector Machine (SVM) dan masalah klasifikasi, hyperplane digunakan untuk memisahkan dua kelas data.
+
+3. **Kernel Trick:**
+   - SVM dapat memproyeksikan data ke dalam dimensi ruang fitur yang lebih tinggi menggunakan fungsi kernel.
+   - Kernel memungkinkan SVM menangani kasus di mana hubungan antar fitur tidak linier.
+
+4. **C (Cost) Parameter:**
+   - Parameter C mengontrol trade-off antara mendapatkan margin yang lebih besar dan meminimalkan kesalahan klasifikasi.
+   - C yang lebih kecil mengizinkan margin yang lebih besar tetapi dapat menghasilkan lebih banyak kesalahan klasifikasi.
+
+5. **Gamma Parameter (untuk Kernel RBF):**
+   - Parameter gamma mengontrol bentuk dari fungsi kernel RBF (Radial Basis Function).
+   - Gamma yang tinggi dapat mengakibatkan model lebih fokus pada data pelatihan, dapat menyebabkan overfitting.
+
+6. **Kelebihan:**
+   - Efektif dalam ruang fitur berdimensi tinggi.
+   - Cocok untuk dataset dengan jumlah fitur yang lebih besar dibandingkan jumlah sampel.
+
+7. **Kekurangan:**
+   - Kurang efisien untuk dataset besar karena kompleksitas waktu yang tinggi.
+   - Sangat dipengaruhi oleh parameter yang dipilih dengan benar.
+
+8. **Aplikasi:**
+   - Pengenalan pola.
+   - Klasifikasi teks dan pengelompokan dokumen.
+   - Klasifikasi citra dan pengenalan wajah.
+
+SVM adalah algoritma yang sangat fleksibel dan dapat diterapkan dalam berbagai konteks, tergantung pada sifat dari data yang dihadapi.
+
+Dalam Support Vector Machine (SVM), kernel digunakan untuk mentransformasikan data ke dalam dimensi yang lebih tinggi sehingga dapat lebih mudah dipisahkan oleh hyperplane. Berikut adalah beberapa jenis kernel yang umum digunakan dalam SVM:
+
+1. **Linear Kernel:** Menghasilkan hyperplane linear dan sesuai untuk dataset yang dapat dipisahkan secara linear.
+
+2. **Polynomial Kernel:** Meningkatkan kompleksitas model dengan menambahkan derajat polinomial \(d\).
+
+3. **Radial Basis Function (RBF) atau Gaussian Kernel:** Cocok untuk kasus ketika batas keputusan antar kelas tidak linear. Parameter \(\gamma\) mengontrol seberapa 'ketat' kernel mengikuti data.
+
+4. **Sigmoid Kernel:** Menyesuaikan fungsi sigmoid dan dapat menangani hubungan nonlinier.
+
+5. **Custom Kernels:** Pengguna dapat mendefinisikan kernel sesuai kebutuhan mereka, asalkan kernel memenuhi kriteria positif definiteness.
+
+Pemilihan kernel sangat tergantung pada sifat data dan kompleksitas relasi antar kelas. Kernel linear biasanya dipilih jika data dapat dipisahkan secara linear, sedangkan kernel nonlinier seperti RBF sering digunakan untuk menangani kasus yang lebih kompleks. Adjusting parameter kernel seperti _gamma_ dan _c_ penting untuk memperoleh hasil yang optimal.
+
+
+
+# Studi Kasus & Problem Bisnis.
+
+**Lending Club** adalah pasar kredit online terbesar di dunia, yang memfasilitasi pinjaman pribadi, pinjaman bisnis, dan pembiayaan untuk prosedur medis. Peminjam mengakses pinjaman dengan suku bunga rendah melalui antarmuka online atau mobile yang cepat dan mudah. Investor menyediakan modal untuk memungkinkan banyak pinjaman dengan imbalan bunga. Perusahaan beroperasi secara online sepenuhnya tanpa kantor cabang, dan menggunakan teknologi untuk menurunkan biaya dan memberikan pengalaman yang luar biasa bagi para peminjam. Perusahaan memberikan penghematan biaya kepada peminjam dalam bentuk suku bunga yang lebih rendah dan kepada investor dalam bentuk imbal hasil yang menarik. Perusahaan mengubah sistem perbankan menjadi pasar online yang bebas hambatan, transparan, dan sangat efisien, membantu masyarakat mencapai tujuan keuangan mereka setiap hari. Perusahaan memerlukan analisis data yang dapat memprediksi pembayaran pinjaman kembali dari nasabah/peminjam dengan memanfaatkan machine learning.
+
+# Load Library
+
+```{r}
+# library untuk manipulasi data, tanggal dan visualsiasi
+library(tidyverse)
+# library untuk membagi partisi data menjadi data training dan testing
+library(caTools)
+# library yang mendukung untuk machine learing model SVM
+library(e1071)
+```
+
+
+# Load Dataset dan Overview
+
+```{r}
+# Import dataset
+loans <- read.csv("data/loan_data.csv")
+
+# melihat struktur data
+glimpse(loans)
+```
+```{r}
+# melihat summary data
+summary(loans)
+```
+```{r}
+# merubah beberapa variabel menjadi factor
+loans$credit.policy <- as.factor(loans$credit.policy)
+loans$inq.last.6mths <-as.factor(loans$inq.last.6mths)
+loans$delinq.2yrs <- as.factor(loans$delinq.2yrs)
+loans$pub.rec <- as.factor(loans$pub.rec)
+loans$not.fully.paid <- as.factor(loans$not.fully.paid)
+```
+
+Dalam SVM, merubah format data menjadi factor yang diperlukan ketika kita memiliki atribut kategorikal (non-numeric) yang perlu dijadikan input untuk model. SVM memerlukan data numerik, dan faktor dalam R adalah representasi data kategorikal. Dengan merubah atribut kategorikal menjadi factor, SVM dapat bekerja dengan efisien karena dapat menangani kategori atau label secara numerik.
+
+```{r}
+glimpse(loans)
+```
+# Exploratory Data Analysis  
+
+```{r}
+# visualisasi fico Score terhadap not.fully.paid
+ggplot(loans, aes(fico)) + 
+  geom_histogram(aes(fill=not.fully.paid), color='black') + 
+  theme_minimal()
+```
+```{r}
+# visualisasi type of loan terhadap not.fully.paid
+ggplot(loans, aes(factor(purpose))) + 
+  geom_bar(aes(fill=not.fully.paid), position= "dodge") + 
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
+
+```
+
+```{r}
+# visualisasi Fico vs Interest Rate
+ggplot(loans, aes(int.rate, fico)) + 
+  geom_point(aes(color=not.fully.paid), alpha=0.5) + 
+  theme_minimal()
+```
+*Latihan*
+Silahkan Anda ekplorasi variabel-variabel yang lainnya. Misalnya melihat hubungan variabel installment dengan not.fully.paid, dll.
+
+```{r}
+# your code
+
+
+
+
+
+```
+
+```{r}
+#melihat distribusi data secara analisis deskriptif
+
+library(summarytools)
+
+descr(loans)
+
+```
+
+# Split Dataset
+
+```{r}
+set.seed(101)
+sample <- sample.split(loans$not.fully.paid, SplitRatio = 0.7) # 70% untuk data train dan sisanya untuk test
+train <- subset(loans, sample == TRUE)
+test <- subset(loans, sample == FALSE)
+```
+
+```{r}
+dim(train)
+dim(test)
+```
+
+```{r}
+tune.out <- tune(svm, not.fully.paid ~ ., data = loans, ranges = list(cost = c(0.1, 1, 10), gamma = c(0.1, 1, 10)))
+summary(tune.out)
+```
+
+
+
+# Model SVM
+
+```{r}
+model <- svm(not.fully.paid ~., data = train[1:14])
+summary(model)
+```
+
+# Prediksi dengan Model SVM
+
+```{r}
+predict.values <- predict(model,test[1:14])
+table(predict.values, test$not.fully.paid)
+```
+Interpretasi:
+1. Baris pertama (0) menunjukkan situasi ketika sebenarnya adalah kelas 0. Model berhasil memprediksi dengan benar sebagai kelas 0 sebanyak 2413 kali.
+
+2. Baris kedua (1) menunjukkan situasi ketika sebenarnya adalah kelas 1. Namun, model tidak berhasil memprediksi dengan benar sebagai kelas 1; semua prediksi pada baris ini adalah kelas 0.
+
+3. Kesimpulan: Model SVM memiliki kinerja baik dalam memprediksi kelas 0, tetapi gagal sepenuhnya dalam memprediksi kelas 1. Diperlukan peninjauan ulang atau peningkatan model untuk meningkatkan kemampuan dalam memprediksi kelas 1.
+
+# Model fine Tuning
+
+```{r}
+tuned.svm <-svm(not.fully.paid ~., data=train[1:14], kernel='radial', cost =100, gamma=0.1)
+predicted.values <- predict(tuned.svm, test[1:14])
+table(predicted.values, test$not.fully.paid)
+```
+Interpretasi:
+1. Baris pertama (0) menunjukkan situasi ketika sebenarnya adalah kelas 0. Model berhasil memprediksi dengan benar sebagai kelas 0 sebanyak 2179 kali, dan gagal sebanyak 358 kali.
+
+2. Baris kedua (1) menunjukkan situasi ketika sebenarnya adalah kelas 1. Model hanya berhasil memprediksi dengan benar sebagai kelas 1 sebanyak 102 kali, sedangkan seharusnya adalah 234 kali.
+
+3. Kesimpulan: Model memiliki kinerja baik dalam memprediksi kelas 0, tetapi kinerja rendah dalam memprediksi kelas 1. Diperlukan peninjauan lebih lanjut atau peningkatan model untuk meningkatkan kemampuan dalam memprediksi kelas 1.
+
+
+# Evaluasi
+
+1. Accuracy (Akurasi): Merupakan metrik yang mengukur sejauh mana model klasifikasi memberikan prediksi yang benar secara keseluruhan. Formula akurasi adalah: 
+
+$$Accuracy= (TP + TN) / (TP+ FP + FN + TN)$$
+```{r}
+accuracy <- (2179+102)/(2179+358+234+102)
+accuracy
+```
+
+2. Precision (Presisi): Mengukur sejauh mana hasil positif dari model klasifikasi adalah benar. Presisi berguna ketika biaya kesalahan positif tinggi. Formula presisi adalah:
+
+$$Precision= TP / (TP + FP)$$
+
+
+```{r}
+precision <- 2179/(2179+358)
+precision
+```
+Recall (Sensitivitas): Menunjukkan sejauh mana model dapat menemukan semua instance positif. Recall berguna ketika biaya kesalahan negatif tinggi. Formula recall adalah:
+
+$$Recall= TP/(TP + FN)$$
+```{r}
+recall <- 2179/(2179+234)
+recall
+```
+
+
+

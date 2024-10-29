@@ -2,7 +2,9 @@
 title: "Modul 06 - Classification"
 author: "Roni Yunis"
 date: "17/09/2024"
-output: pdf_document
+output:
+  html_document:
+    df_print: paged
 ---
 
 ```{r setup, include=FALSE}
@@ -134,7 +136,7 @@ table(credit$foreign_worker)
 Ternyata kategori untuk pekerja asing yang paling banyak yaitu sebanyak 963
 
 *Latihan*
-Berapa banyak foreign_worker yang mengujukan credit (purpose) untuk Radio/TV?
+Berapa banyak foreign_worker yang mengajukan credit (purpose) untuk Radio/TV?
 
 ```{r}
 # Your Code
@@ -359,5 +361,14 @@ Nilai AUC nya adalah 76,5%, artinya klasifikasi yang dihasilkan termasuk pada **
 
 Kalau kita bandingkan dari kedua model tersebut, kinerja dari klasifikasi dengan *Random Forest* **lebih baik sedikit** dibandingkan dengan *Decision Tree*
 
+*Latihan Lanjutan*
+Lakukan analisis prediksi klasifikasi dengan Random Forest untuk variabel kategorical yang lain
+
+```{r}
+# your code
+
+
+
+```
 
 
