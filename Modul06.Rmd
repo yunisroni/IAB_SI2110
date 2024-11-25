@@ -2,7 +2,10 @@
 title: "Modul 06 - Clustering"
 author: "Roni Yunis"
 date: "17/09/2024"
-output: pdf_document
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
 ---
 
 # Pengantar
@@ -36,10 +39,7 @@ Library (tidyverse)  = dplyr + ggplot2 + lubridate
 
 ```{r}
 # Manipulasi data
-library(dplyr)
-
-# Visualisasi data
-library(ggplot2)
+library(tidyverse)
 
 # Untuk melakukan klasterisasi
 library(cluster)
@@ -76,7 +76,7 @@ Pada bagian ini kita akan melakukan klasterisasi berdasarkan atribut `TotCases`,
 
 ```{r}
 # Menampilkan nama atribut dalam objek corona yang akan di klasterisasi
-set.seed(999) #memilih secara acak setiap observasi klustering
+set.seed(20) #memilih secara acak setiap observasi klustering
 covid <- corona[c(1:4,9)] #mengambil atribut ke 1 s/d 4 dan atribut ke 9 (total ada 5 atribut)
 colnames(covid)
 ```
@@ -125,6 +125,12 @@ klasterCovid <-  get_dist(covid, stand = TRUE)
 k3 <-  kmeans(klasterCovid, centers = 3, nstart = 25)
 k4 <-  kmeans(klasterCovid, centers = 4, nstart = 25)
 ```
+
+```{r}
+summary(k3)
+```
+
+
 
 ```{r}
 # Mendefinisikan plot diagram dari klasterisasi

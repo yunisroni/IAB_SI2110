@@ -7,7 +7,9 @@ output:
   html_document: default
 ---
 
-**Support Vector Machine (SVM)** adalah sebuah algoritma machine learning yang digunakan untuk tugas klasifikasi dan regresi. Ini adalah model prediktif yang efektif dan dapat digunakan baik untuk data terstruktur maupun tidak terstruktur. Berikut adalah penjelasan detil tentang SVM:
+**Support Vector Machine (SVM)** adalah sebuah algoritma machine learning yang digunakan untuk tugas klasifikasi dan regresi. Untuk prediksi dengan data kontinu, maka dapat diterapkan model SVR (Support Vector Regression).
+
+Ini adalah model prediktif yang efektif dan dapat digunakan baik untuk data terstruktur maupun tidak terstruktur. Berikut adalah penjelasan detil tentang SVM:
 
 1. **Tujuan Utama:**
    - **Klasifikasi:** SVM digunakan untuk memisahkan instance data ke dalam kelas-kelas yang berbeda.
@@ -69,9 +71,9 @@ Pemilihan kernel sangat tergantung pada sifat data dan kompleksitas relasi antar
 # Load Library
 
 ```{r}
-# library untuk manipulasi data, tanggal dan visualsiasi
+# library untuk manipulasi data, tanggal dan visualsiasi (dplyr, lubridate, ggplot2)
 library(tidyverse)
-# library untuk membagi partisi data menjadi data training dan testing
+# library untuk membagi partisi data menjadi data training dan testing (bentuk lain dari library caret)
 library(caTools)
 # library yang mendukung untuk machine learing model SVM
 library(e1071)
@@ -162,14 +164,6 @@ test <- subset(loans, sample == FALSE)
 dim(train)
 dim(test)
 ```
-
-```{r}
-tune.out <- tune(svm, not.fully.paid ~ ., data = loans, ranges = list(cost = c(0.1, 1, 10), gamma = c(0.1, 1, 10)))
-summary(tune.out)
-```
-
-
-
 # Model SVM
 
 ```{r}
@@ -184,7 +178,7 @@ predict.values <- predict(model,test[1:14])
 table(predict.values, test$not.fully.paid)
 ```
 Interpretasi:
-1. Baris pertama (0) menunjukkan situasi ketika sebenarnya adalah kelas 0. Model berhasil memprediksi dengan benar sebagai kelas 0 sebanyak 2413 kali.
+1. Baris pertama (0) menunjukkan situasi ketika sebenarnya adalah kelas 0. Model berhasil memprediksi dengan benar sebagai kelas 0 sebanyak 1609 kali.
 
 2. Baris kedua (1) menunjukkan situasi ketika sebenarnya adalah kelas 1. Namun, model tidak berhasil memprediksi dengan benar sebagai kelas 1; semua prediksi pada baris ini adalah kelas 0.
 
@@ -200,7 +194,7 @@ table(predicted.values, test$not.fully.paid)
 Interpretasi:
 1. Baris pertama (0) menunjukkan situasi ketika sebenarnya adalah kelas 0. Model berhasil memprediksi dengan benar sebagai kelas 0 sebanyak 2179 kali, dan gagal sebanyak 358 kali.
 
-2. Baris kedua (1) menunjukkan situasi ketika sebenarnya adalah kelas 1. Model hanya berhasil memprediksi dengan benar sebagai kelas 1 sebanyak 102 kali, sedangkan seharusnya adalah 234 kali.
+2. Baris kedua (1) menunjukkan situasi ketika sebenarnya adalah kelas 1. Model hanya berhasil memprediksi dengan benar sebagai kelas 1 sebanyak 234 kali, sedangkan seharusnya adalah 358 kali.
 
 3. Kesimpulan: Model memiliki kinerja baik dalam memprediksi kelas 0, tetapi kinerja rendah dalam memprediksi kelas 1. Diperlukan peninjauan lebih lanjut atau peningkatan model untuk meningkatkan kemampuan dalam memprediksi kelas 1.
 
@@ -211,7 +205,7 @@ Interpretasi:
 
 $$Accuracy= (TP + TN) / (TP+ FP + FN + TN)$$
 ```{r}
-accuracy <- (2179+102)/(2179+358+234+102)
+accuracy <- (2179+102)/(2179+234+358+102)
 accuracy
 ```
 
@@ -221,15 +215,23 @@ $$Precision= TP / (TP + FP)$$
 
 
 ```{r}
-precision <- 2179/(2179+358)
+precision <- 2179/(2179+234)
 precision
 ```
 Recall (Sensitivitas): Menunjukkan sejauh mana model dapat menemukan semua instance positif. Recall berguna ketika biaya kesalahan negatif tinggi. Formula recall adalah:
 
 $$Recall= TP/(TP + FN)$$
 ```{r}
-recall <- 2179/(2179+234)
+recall <- 2179/(2179+358)
 recall
+```
+*Latihan dirumah*
+ekplorasi lagi satu matrik lagi namanya adalah F1-Score
+
+```{r}
+# hitung F1-Score
+# your code
+
 ```
 
 
