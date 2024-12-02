@@ -1,0 +1,435 @@
+---
+title: "Modul 09 - Multiple Linear Regression"
+author: "Roni Yunis"
+date: "12/11/2023"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Pengantar
+
+Regresi Liner Berganda adalah bentuk lain dari regresi liner sederhana yang digunakan untuk memprediksi viariabel Y (dependent), berdasarkan beberapa variabel prediktor X (independent)
+Kalau dengan 3 variabel prediktor, maka prediksi Y bisa dinyatakan dalam persamaan berikut:
+
+$$y = \beta0 + \beta1.x1 + \beta2.x2 + \beta3.x3 + \epsilon$$
+
+Nilai $\beta$ disebut dengan bobot regresi (koefisien beta), digunakan untuk mengukur hubungan antara variabel prediktor dan hasil. $bj$ dapat diartikan sebagai efek rata-rata pada $y$ dari peningkatan satu unit dalam $xj$, dimana semua prediktor lainnya tetap. Dalam Modul 09 ini kita akan membahas:
+
+1. Bagaimana membangun model regresi berganda dan bagaimana cara menginterpretasikannya
+
+2. Memeriksa kualitas dari model yang sudah dihasilkan
+
+# Data Preparation
+Dalam kasus ini, kita akan menggunakan dataset yang ada pada packages datarium, nama datasetnya adalah **marketing**, sebelum kita menggunakan dataset tersebut, kita akan install dulu `library (datarium)`
+
+```{r}
+#Manipulasi data
+library(dplyr)
+
+#Split dataset 
+library (caTools)
+
+#Predicting result visualization
+library(ggplot2)
+
+#dataset marketing
+library(datarium)
+```
+
+```{r}
+#menampilkan isi dataset 6 baris teratas
+head(marketing)
+```
+Kita akan melihat ringkasan data dari dataset marketing
+
+```{r}
+glimpse(marketing)
+```
+
+
+```{r}
+summary(marketing)
+```
+
+Bisa dilihat bahwa, ada 4 buah kolom youtube, facebook, newspaper, dan sales
+
+```{r}
+cor(marketing)
+```
+
+
+
+```{r}
+library(corrplot)
+
+# Membuat korelasi dengan matrik
+marketing_cor <- cor(marketing)
+corrplot(marketing_cor, method = "color", addCoef.col = "green")
+```
+
+```{r}
+library(GGally)
+
+# Buat correlogram
+ggpairs(marketing, 
+        columns = 1:4,  # Pilih kolom yang akan diplot
+        title = "Correlation Multiple Variables",
+        lower = list(continuous = "points", mapping = aes(color = youtube)),
+        diag = list(continuous = "barDiag"))
+```
+
+
+
+```{r}
+# Visualisasi dampak youtube pada sales
+#library(ggplot2)
+
+ggplot(marketing, 
+       aes(youtube, sales)) +
+  geom_point() +
+  geom_smooth() +
+  labs(
+    title = "Dampak Youtube terhadap Penjualan", 
+    subtitle = "Marketing", 
+    caption = "by: Roni Yunis", 
+    x = "Youtube", 
+    y = "Sales" 
+  ) + 
+  theme_minimal()
+ 
+```
+
+
+```{r}
+# Visualisasi dampak facebook pada sales
+library(ggplot2)
+ggplot(marketing, 
+       aes(facebook, sales)) +
+  geom_point() +
+  geom_smooth() +
+  labs(
+    title = "Dampak Facebook terhadap Penjualan", 
+    subtitle = "Marketing", 
+    caption = "by: Roni Yunis", 
+    x = "Facebook", 
+    y = "Sales" 
+  ) + 
+  theme_minimal()
+```
+
+
+```{r}
+# Visualisasi dampak Newspaper pada sales
+library(ggplot2)
+ggplot(marketing, 
+       aes(newspaper, sales)) +
+  geom_point() +
+  geom_smooth() +
+  labs(
+    title = "Dampak Newspaper terhadap Penjualan", 
+    subtitle = "Marketing", 
+    caption = "by: Roni Yunis", 
+    x = "Newspaper", 
+    y = "Sales" 
+  ) + 
+  theme_minimal()
+```
+
+# Model Regresi dan Interpretasi
+Sekarang kita akan membuat model regresi untuk memprediksi tingkat penjualan dari biaya iklan yang sudah dimuat pada youtube, facebook dan newspaper. Kalau kita buat model regresinya, maka sales adalah variabel dependen (y), youtube, facebook, dan newspaper adalah variabel independen (x). Sehingga model regresinya bisa didefinisikan menjadi seperti persamaan berikut:
+
+$$sales = \beta0 + \beta1.youtube + \beta2.facebook + \beta3.newspaper$$ 
+
+Model regresinya akan kita simpan kedalam objek *liner*
+
+```{r}
+liner_1 <- lm(sales ~ youtube + facebook + newspaper, data = marketing)
+summary(liner_1)
+```
+p-value youtube terhadap sales = 0.00000000000000022 < 0.05 (signifikan)
+p-value facebook terhadap sales = 0.00000000000000022 < 0.05 (signifikan)
+
+Langkah pertama yang dapat kita gunakan untuk menafsirkan analisis regresi berganda yang sudah kita lakukan, adalah memeriksa nilai statik F dan nilai p yang terkait, hal ini bisa kita lihat pada baris terakhir dari hasil model regresi. Dalam contoh kali ini, didapat bahwa nilai p-value dari F-Statistik adalah < 2.2e-16 (0.00000000000000022) , artinya nilai ini adalah sangat signifikan. Jadi bisa disimpulkan bahwa salah satu dari variabel prediktor (independen) berhubungan secara signifikan dengan variabel hasil (dependen).
+
+Untuk melihat variabel prediktor mana yang paling signifikan, kita dapat memeriksa nilai koefisiennya, tabel koefisien digunakan untuk melihat estimasi koefisien beta regresi dan nilai t-statistik p-value yang terkait. Untuk menghitung nilai koefisien regresi tsb, maka bisa kita tulis seperti ini:
+
+```{r}
+summary(liner_1)$coefficient
+```
+
+Kalau kita lihat dari hasil diatas (t value), terlihat bahwa anggaran iklan melalui youtube dan facebook berhubungan secara signifikan dengan perubahan penjualan. Tetapi anggaran untuk surat kabar tidak berhubungan signifikan. Sehingga bisa kita simpulkan bahwa jika anggaran $1000 untuk iklan di *facebook* maka akan menyebabkan peningkatan rata-rata penjualan sebesar *0,1885x1000 = 189* unit penjualan. Jika kita lihat dari koefisien *youtube*, maka rata-rata peningkatan penjualan sebesar *0.045x1000 = 45* unit penjualan.
+
+Jadi dari ketiga variabel yang ada, hanya 2 variabel yang mempengaruhi tingkat penjualan. Karena variabel *newspaper* tidak signifikan maka kita bisa perbaiki model regresi sebelumnya dengan cara tidak memasukkan variabel *newspaper* kedalamnya.
+
+```{r}
+liner_2 <- lm(sales ~ youtube + facebook, data = marketing)
+summary(liner_2)
+```
+
+Sehingga berdasarkan model tersebut, maka kita bisa defenisikan persamaan dari model tersebut menjadi:
+
+$$sales = 3.505 + 0,046.youtube + 0,188.facebook$$
+Nilai anggaran iklan di youtube: 276.12, dan iklan di facebook: 45.36
+
+
+$$sales = 3.505 + (0,046*276.12) + (0,188*45.36)$$
+```{r}
+sales = 3.505 + (0.046*276.12) + (0.188*45.36)
+sales
+```
+Nilai Aktual = 26.52, nilai Prediksi = 24.732. Nilai prediksi dengan nilai aktual ada selisih.
+
+Nilai confiden interval dari model tersebut, bisa kita hitung dengan fungsi `confint()`
+
+```{r}
+confint(liner_2)
+```
+
+
+# Model Akurasi
+Untuk melihat akurasi dari model liner yang sudah dihasilkan secara statistik bisa melihat pada hasil *Adjusted R-squared*, dalam contoh kasus ini nilainya adalah 0,896 artinya 89,6% dari nilai penjualan dapat ditingkatkan oleh anggaran dari iklan *youtube* dan *facebook*.
+
+Selanjutnya adalah bagaimana cara kita mengukur kesalahan prediksi atau **Residual Standard Error (RSE)** atau menggunakan fungsi `sigma()`. Dalam sebuah model regresi yang baik, semakin rendah nilai RSE, maka akan semakin akurat model regresi tersebut. Untuk menghitungnya kita bisa membagi nilai RSE dengan rata-rata variabel hasil.
+
+```{r}
+sigma(liner_2)/mean(marketing$sales)
+```
+Jadi bisa dilihat bahwa tingkat kesalahan (error rate) dari model yang sudah dihasilkan adalah sebesar 12 %. Bisa kita simpulkan tingkat akurasi dari model adalah 100% - 12% = 88%
+
+
+**Latihan**
+Dari model regresi yang sudah kita bahas sebelumnya, kelihatan bahwa hanya 2 variabel yang berpengaruh pada penjualan. Variabel yang tidak berpengaruh adalah variabel *newspaper*, sekarang coba Anda buktikan kalau hanya ada satu varibel yaitu *newspaper* saja apakah benar-benar tidak berpengaruh pada nilai penjualan?
+
+$$sales = b0 + b1*newspaper$$ 
+```{r}
+# pangaruh newspaper terhadap sales
+
+liner_3 <- lm(sales ~ newspaper, data = marketing)
+summary(liner_3)
+
+```
+Interpretasi: variabel newspaper berpengaruh positif dan signifikan terhadap sales, tapi pengaruhnya tidak besar atau relatif kecil, karena nilai R-square = 0.05212
+
+
+Jika nilai iklan di newspaper 1000, maka berapa nilai penjualan (sales)?
+
+$$sales = 14.82169 + (0.05469*newspaper)$$
+$$sales = 14.82169 + (0.05469*1000)$$
+```{r}
+sales_newspaper = 14.82169 + (0.05469*1000)
+sales_newspaper
+```
+```{r}
+sales_yf = 3.505 + (0.046*1000) + (0.188*1000)
+sales_yf
+```
+
+
+# Model Regresi dengan Model GLM (Generalized Linear Model)
+
+## Bagi dataset kedalam data training dan data testing
+```{r}
+splitdata <- sample.split(marketing$sales, SplitRatio = 0.7) # 70% untuk data training, sisanya data testing
+trainingset <- subset(marketing, splitdata == TRUE)
+testingset <- subset(marketing, splitdata == FALSE)
+```
+
+```{r}
+dim(trainingset)
+dim(testingset)
+```
+
+## Model Regresi
+Fit Model 1
+```{r}
+# library model GLM
+library(glm2)
+
+# model GLM untuk memprediksi variabel sales pada data training
+model_glm_1 <- glm(sales ~ youtube + facebook + newspaper, data = trainingset, 
+                 family = gaussian(link = "identity"), # distribusi probabilitas dari variabel respons
+                 control = list(epsilon = 1e-8, # nilai batasan toleransi kesalahan (0.00000001)
+                                maxit =100)     # jumlah iterasi
+                 )
+
+# melihat hasil model prediksi
+summary(model_glm_1)
+```
+
+**Latihan**
+Coba diidentifikasi jenis family secara umum dalam GLM?, kemudian coba implementasikan ke dalam model. Kalau bisa anda bandingkan hasilnya. Model dengan hyperparameter mana yang paling baik?
+
+
+## Prediksi data testing dengan model
+```{r}
+# Melakukan prediksi produksi dengan model GLM pada data testing
+predicted_glm_1 <- predict(model_glm_1, newdata = testingset, type = "response")
+
+# Menampilkan hasil prediksi
+head(predicted_glm_1)
+```
+
+
+```{r}
+head(testingset$sales)
+```
+
+## Visualisasi Hasil Prediksi
+```{r}
+# Visualisasi Hasil
+result_data_glm <- data.frame(sales = testingset$sales, Predictions = predicted_glm_1)
+
+# Visualisasi Perbandingan Produksi Aktual dengan Hasil Prediksi
+ggplot(data = result_data_glm, aes(x = sales, y = Predictions)) +
+  geom_point() +
+  geom_abline(intercept = 0, slope = 1, color = "red", linetype = "dashed") +
+  scale_x_continuous(labels = scales::comma) +
+  scale_y_continuous(labels = scales::comma) +
+  labs(x = "Actual Sales", y = "Predicted Sales") +
+  ggtitle("Comparison of Actual Sales and GLM Model Prediction") +
+  theme_minimal()
+```
+
+```{r}
+# Visualisasi Produksi Aktual dengan Hasil Prediksi
+ggplot(data = result_data_glm, aes(x = 1:length(sales))) +
+  geom_line(aes(y = sales, color = "Actual"), size = 1) +
+  geom_line(aes(y = Predictions, color = "GLM Prediction"), size = 1) +
+  labs(x = "Observation", y = "Sales") +
+  scale_color_manual(values = c("Actual" = "blue", "GLM Prediction" = "red")) +
+  ggtitle("Comparison of Actual Sales and GLM Model Prediction") +
+  theme_minimal()
+```
+Konsep Evaluasi Model dengan Metrik Perfomansi Model: MAE, MSE, RMSE, dan MAPE:
+
+1. **Mean Absolute Error (MAE):**
+   
+   $$MAE = \frac{1}{n} \sum_{i=1}^{n} |y_i - \hat{y}_i| $$
+   
+   Rata-rata dari nilai absolut dari selisih antara nilai sebenarnya $y_i$ dan nilai prediksi $\hat{y}_i$. MAE memberikan gambaran tentang seberapa besar kesalahan prediksi rata-rata dalam skala asli.
+
+2. **Mean Squared Error (MSE):**
+    $$MSE = \frac{1}{n} \sum_{i=1}^{n} (y_i - \hat{y}_i)^2$$
+   
+   Rata-rata dari kuadrat selisih antara nilai sebenarnya $y_i$ dan nilai prediksi $\hat{y}_i$. MSE memberikan lebih banyak bobot pada kesalahan besar.
+
+3. **Mean Absolute Percentage Error (MAPE):**
+   $$MAPE = \frac{1}{n} \sum_{i=1}^{n} \left( \frac{|y_i - \hat{y}_i|}{|y_i|} \right) \times 100\%$$
+   
+   Rata-rata persentase dari nilai absolut dari selisih antara nilai sebenarnya $y_i$ dan nilai prediksi $\hat{y}_i$, dinormalkan dengan nilai sebenarnya. MAPE memberikan indikasi kesalahan relatif dalam persentase.
+
+4. **Root Mean Squared Error (RMSE):**
+   $$RMSE = \sqrt{\frac{1}{n} \sum_{i=1}^{n} (y_i - \hat{y}_i)^2}$$
+   
+   Akar kuadrat dari MSE. RMSE memberikan ukuran kesalahan yang serupa dengan MAE tetapi memberikan bobot lebih besar pada kesalahan yang lebih besar.
+
+Pilihan metrik tergantung pada konteks dan preferensi spesifik. MAE, MSE, dan RMSE mengukur kesalahan dalam skala asli, sementara MAPE memberikan pengukuran kesalahan relatif dalam persentase. Dalam beberapa kasus, Anda mungkin perlu mempertimbangkan karakteristik spesifik dari masalah regresi yang sedang dihadapi untuk memilih metrik yang sesuai. Pemilihan metrik performansi tergantung pada tipe masalah dan tujuan spesifik dari model prediksi yang sedang dievaluasi.
+
+
+## Evaluasi Model
+```{r}
+# Evaluasi GLM Model
+library(Metrics)
+
+
+# Hitung MAE (Mean Absolute Error)
+mae_value_glm_1 <- mae(testingset$sales, predicted_glm_1)
+
+# Hitung MSE (Mean Squared Error)
+mse_value_glm_1 <- mse(testingset$sales, predicted_glm_1)
+
+# Hitung RMSE (Root Mean Square Error)
+rmse_value_glm_1 <- rmse(testingset$sales, predicted_glm_1)
+
+# Hitung MAPE (Mean Absolute Percent Error)
+mape_value_glm_1 <- mape(testingset$sales, predicted_glm_1)
+
+# Tampilkan hasil evaluasi
+cat(paste("MAE: ", mae_value_glm_1, "\n"))
+cat(paste("MSE: ", mse_value_glm_1, "\n"))
+cat(paste("RMSE: ", rmse_value_glm_1, "\n"))
+cat(paste("MAPE: ", mape_value_glm_1, "%\n"))
+```
+
+
+Fit Model 2
+```{r}
+# library model GLM
+#library(glm2)
+
+# model GLM untuk memprediksi variabel sales pada data training
+model_glm_2 <- glm(sales ~ youtube + facebook + newspaper, data = trainingset, 
+                 family = gaussian(link = "identity"), # distribusi probabilitas dari variabel respons
+                 control = list(epsilon = 1e-8, # nilai batasan toleransi kesalahan (0.00000001)
+                                maxit =500)     # jumlah iterasi 500 kali
+                 )
+
+# melihat hasil model prediksi
+summary(model_glm_2)
+```
+
+
+```{r}
+# Melakukan prediksi produksi dengan model GLM pada data testing
+predicted_glm_2 <- predict(model_glm_2, newdata = testingset, type = "response")
+
+# Menampilkan hasil prediksi
+head(predicted_glm_2)
+```
+
+
+```{r}
+# Visualisasi Hasil
+result_data_glm_2 <- data.frame(sales = testingset$sales, Predictions = predicted_glm_2)
+
+# Visualisasi Perbandingan Produksi Aktual dengan Hasil Prediksi
+ggplot(data = result_data_glm_2, aes(x = sales, y = Predictions)) +
+  geom_point() +
+  geom_abline(intercept = 0, slope = 1, color = "red", linetype = "dashed") +
+  scale_x_continuous(labels = scales::comma) +
+  scale_y_continuous(labels = scales::comma) +
+  labs(x = "Actual Sales", y = "Predicted Sales") +
+  ggtitle("Comparison of Actual Sales and GLM Model Prediction") +
+  theme_minimal()
+```
+
+
+```{r}
+# Visualisasi Produksi Aktual dengan Hasil Prediksi
+ggplot(data = result_data_glm_2, aes(x = 1:length(sales))) +
+  geom_line(aes(y = sales, color = "Actual"), size = 1) +
+  geom_line(aes(y = Predictions, color = "GLM Prediction"), size = 1) +
+  labs(x = "Observation", y = "Sales") +
+  scale_color_manual(values = c("Actual" = "blue", "GLM Prediction" = "red")) +
+  ggtitle("Comparison of Actual Sales and GLM Model Prediction") +
+  theme_minimal()
+```
+
+```{r}
+# Evaluasi GLM Model
+#library(Metrics)
+
+
+# Hitung MAE (Mean Absolute Error)
+mae_value_glm_2 <- mae(testingset$sales, predicted_glm_2)
+
+# Hitung MSE (Mean Squared Error)
+mse_value_glm_2 <- mse(testingset$sales, predicted_glm_2)
+
+# Hitung RMSE (Root Mean Square Error)
+rmse_value_glm_2 <- rmse(testingset$sales, predicted_glm_2)
+
+# Hitung MAPE (Mean Absolute Percent Error)
+mape_value_glm_2 <- mape(testingset$sales, predicted_glm_2)
+
+# Tampilkan hasil evaluasi
+cat(paste("MAE: ", mae_value_glm_2, "\n"))
+cat(paste("MSE: ", mse_value_glm_2, "\n"))
+cat(paste("RMSE: ", rmse_value_glm_2, "\n"))
+cat(paste("MAPE: ", mape_value_glm_2, "%\n"))
+```
+
+

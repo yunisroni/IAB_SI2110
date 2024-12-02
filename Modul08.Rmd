@@ -1,0 +1,403 @@
+---
+title: "Modul 08 - Simple Linear Regression"
+author: "Roni Yunis"
+date: "12/02/2024"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+# Pengantar
+Regresi linear sederhana adalah suatu metode statistik yang digunakan untuk memodelkan hubungan linier antara satu variabel bebas (independen) dengan satu variabel terikat (dependen). Dalam konteks ini, "linier" mengacu pada hubungan garis lurus antara variabel-variabel tersebut.
+
+Dalam persamaan regresi linear sederhana, dapat dinyatakan sebagai berikut:
+
+$$Y = \beta_0 + \beta_1X + \varepsilon$$
+
+- $Y$ adalah variabel terikat (dependen).
+- $X$ adalah variabel bebas (independen).
+- $\beta0$ adalah intercept (konstanta).
+- $\beta1$ adalah koefisien regresi yang mengukur tingkat perubahan dalam $Y$ untuk setiap satu unit perubahan dalam $X$.
+- $\varepsilon$ adalah kesalahan acak yang tidak dapat dijelaskan oleh model dan diasumsikan mengikuti distribusi normal dengan mean nol.
+
+Tujuan utama dari regresi linear sederhana adalah menemukan nilai-nilai $\beta0$ dan $\beta1$ yang meminimalkan jumlah kuadrat kesalahan (sum of squared errors) antara nilai prediksi yang diberikan oleh model dan nilai aktual dari variabel terikat.
+
+Regresi linear sederhana dapat digunakan untuk memahami dan memodelkan hubungan antara dua variabel, serta melakukan prediksi berdasarkan data yang ada. Metode ini umum digunakan dalam statistika dan analisis data.
+
+Contoh:
+
+Anggaplah Anda bekerja dalam sebuah perusahaan ritel dan Anda ingin memahami hubungan antara jumlah uang yang dihabiskan oleh pelanggan dalam satu transaksi $X$ dengan total pendapatan penjualan $Y$ pada transaksi tersebut. Anda dapat menggunakan regresi linear sederhana untuk memodelkan hubungan tersebut.
+
+Contoh Persamaan Regresi Linear Sederhana:
+
+$$Y = \beta_0 + \beta_1X + \varepsilon$$
+
+- $Y$: Total pendapatan penjualan dalam satu transaksi.
+- $X$: Jumlah uang yang dihabiskan oleh pelanggan dalam satu transaksi.
+- $\beta_0$: Intercept (konstanta), mewakili pendapatan penjualan yang dihasilkan ketika $X$ sama dengan nol.
+- $\beta_1$: Koefisien regresi, menunjukkan seberapa banyak pendapatan penjualan meningkat untuk setiap peningkatan satu unit dalam $X$.
+- $\varepsilon$: Kesalahan acak.
+
+Anda mengumpulkan data dari sejumlah transaksi dan kemudian menggunakan regresi linear sederhana untuk mengestimasi nilai $\beta_0$ dan $\beta_1$. Setelah memperoleh model regresi, Anda dapat menggunakannya untuk membuat prediksi. Misalnya, jika seorang pelanggan menghabiskan $50 dalam transaksi, berapa total pendapatan penjualan yang diperkirakan?
+
+# Contoh Implementasi dengan R
+
+## Load Packages
+```{r}
+#Split dataset 
+library (caTools)
+#Predicting result visualization
+library(ggplot2)
+#Import dataset marketing pada library datarium
+library(datarium)
+#library manipulasi data
+library(dplyr)
+
+```
+
+```{r}
+marketing
+```
+
+
+
+## View dataset
+```{r}
+head(marketing)
+```
+
+Melihat dimensi dari data, dengan menggunakan fungsi dim()
+```{r}
+dim(marketing)
+```
+Melihat struktur dari data, dengan menggunakan fungsi glimpse()
+```{r}
+glimpse(marketing)
+```
+
+## Exploratory Data Analysis
+
+```{r}
+# Melihat summary data
+summary(marketing)
+```
+
+```{r}
+# Melihat korelasi atau hubungan antar variabel
+cor(marketing)
+```
+
+Sekarang kita akan mencoba melihat korelasi antara facebook dengan sales
+
+```{r}
+#menghitung korelasi antar variabel
+korfacebook <- cor(marketing$facebook, marketing$sales)
+korfacebook
+```
+$$Y = \beta_0 + \beta_1X + \varepsilon$$
+Y = Sales
+X = Facebook
+
+$$Sales = \beta_0 + \beta_1facebook + \varepsilon$$
+
+Koefisien korelasi mengukur tingkat hubungan antara dua variabel x dan y. Nilainya berkisar antara -1 (korelasi negatif sempurna: ketika x meningkat, y menurun) dan +1 (korelasi positif sempurna: ketika x meningkat, y meningkat).
+
+Nilai yang mendekati 0 menunjukkan hubungan yang lemah antara variabel. Korelasi yang rendah (-0,2 <x <0,2) mungkin menunjukkan bahwa banyak variasi dari variabel hasil (y) tidak dijelaskan oleh prediktor (x). Dalam kasus seperti itu, kita mungkin harus mencari variabel prediktor yang lebih baik.
+
+Dalam contoh ini, koefisien korelasinya antara variabel facebook dan sales adalah sebesar 0,57
+
+## Bagi dataset kedalam data training dan data testing
+```{r}
+splitdata <- sample.split(marketing$sales, SplitRatio = 0.7)
+trainingset <- subset(marketing, splitdata == TRUE)
+testingset <- subset(marketing, splitdata == FALSE)
+```
+
+```{r}
+dim(trainingset)
+dim(testingset)
+```
+
+Bisa dilihat bahwa untuk data training ada 140 baris data, dan untuk data testing ada 60 baris data
+
+
+## Model Regresi Sederhana
+### liner regresi sederhana pada data training
+```{r}
+# Analisis regresi untuk variabel facebook terhap sales
+
+lm.r <- lm(sales ~ facebook,
+           data = trainingset)
+summary(lm.r)
+```
+Nilai P-Value = 0.00000000000000057
+
+
+
+
+$$Sales = 10.89708 + 0.21956.facebook + \varepsilon$$ 
+
+Misalnya facebooknya Rp. 3500, berapakah nilai penjualan (sales)?
+Persamaan regresi linernya adalah:
+
+$$Sales = 10.89708 + (0.21956 * 3500) + \varepsilon$$ 
+
+```{r}
+sales_f = 10.89708 + (0.21956 * 3500)
+sales_f
+```
+Kalau kita lihat dari model diatas bahwa facebook punya hubungan signifikan terhadap penjualan, artinya nilai penjualan dapat ditingkatkan dari anggaran iklan pada facebook. 
+
+
+### Prediksi model regresi dengan data testing
+```{r}
+yprediksi <- predict(lm.r, newdata = testingset)
+head(yprediksi)
+``` 
+
+### Visualasi hasil data training
+```{r}
+ggplot() + geom_point(aes(x = trainingset$facebook,
+                          y = trainingset$sales), colour = 'red') +
+  geom_line(aes(x = trainingset$facebook,
+                y = predict( lm.r, newdata = trainingset)), colour = 'blue') +
+  ggtitle('Pengaruh Facebook terhadap Sales (Data Training)') +
+  xlab('facebook') +
+  ylab('sales')
+```
+
+### Visualasi hasil data testing
+```{r}
+ggplot() + geom_point(aes(x = testingset$facebook,
+                          y = testingset$sales), colour = 'red') +
+  geom_line(aes(x = testingset$facebook,
+                y = predict(lm.r, newdata = testingset)), colour = 'blue') +
+  ggtitle('Pengaruh Facebook terhadap Sales (Data Testing)') +
+  xlab('Facebook') +
+  ylab('Sales')
+```
+
+### Evaluasi
+
+**Sum of Squared Errors (SSE)** adalah metrik evaluasi yang mengukur jumlah kuadrat dari selisih antara nilai prediksi dari model regresi dan nilai aktual dalam data. SSE dapat memberikan gambaran tentang seberapa baik model sesuai dengan data.
+
+Dalam konteks regresi linear sederhana, SSE dihitung dengan menjumlahkan kuadrat dari selisih antara nilai prediksi $\hat{Y_i}$ dan nilai aktual $Y_i$ untuk setiap observasi:
+
+$$SSE = \sum_{i=1}^{n} (Y_i - \hat{Y_i})^2$$
+
+Dalam R, Anda dapat mengakses SSE langsung dari objek model regresi menggunakan fungsi `sum(model$residuals^2)`. Semakin kecil nilai SSE, semakin baik modelnya, karena SSE mencerminkan seberapa baik model dapat memperkirakan nilai aktual dalam dataset. Namun, penggunaan SSE sebaiknya selalu dikombinasikan dengan metrik evaluasi lainnya, seperti R-squared, MSE, atau uji lainnya, untuk mendapatkan gambaran yang lengkap tentang kinerja model.
+
+```{r}
+# Menghitung SSE
+sse_f <- sum(lm.r$residuals^2)
+cat("Sum of Squared Errors (SSE):", sse_f, "\n")
+
+```
+**R-Squared**, Nilai R-squared mengindikasikan seberapa besar variasi dalam variabel terikat yang dapat dijelaskan oleh model. Nilai R-squared berkisar antara 0 (model tidak menjelaskan variasi sama sekali) hingga 1 (model menjelaskan seluruh variasi). Anda dapat menghitung R-squared (koefisien determinasi) dari model regresi linear sederhana menggunakan fungsi `summary()` pada objek model
+
+```{r}
+# Mengitung R-Square
+model.summary <- summary(lm.r)
+r_squared_f <- model.summary$r.squared
+cat("R-squared:", r_squared_f, "\n")
+```
+**Mean Squared Error (MSE)** Menghitung MSE dapat memberikan gambaran tentang seberapa baik model dapat menjelaskan variasi dalam data. Semakin rendah MSE dan semakin tinggi $R^2$, semakin baik modelnya.
+
+```{r}
+# Menghitung MSE
+mse <- mean(lm.r$residuals^2)
+cat("Mean Squared Error (MSE):", mse, "\n")
+```
+
+Metode evaluasi ini memberikan pandangan holistik tentang kinerja model regresi linear sederhana, dan pemilihan metode yang sesuai tergantung pada kebutuhan spesifik analisis Anda.
+
+
+
+# Latihan
+1. Buatlah model regresi untuk hubungan variabel `youtube` terhadap variabel `sales`
+
+2. Buatlah model regresi unutk hubungan variabel `newpaper` terhadap variabel `sales` 
+
+## 1. Model Regresi Youtube terhadap Sales
+
+```{r}
+# menghitung korelasi antar variabel
+koryoutube <- cor(marketing$youtube, marketing$sales)
+koryoutube
+
+```
+Nilai korelasi dari kedua variabel adalah 0.7822244
+
+Persamaan regresi dari youtube terhadap sales:
+
+$$Sales = \beta_0 + \beta_1youtube + \varepsilon$$
+
+```{r}
+# liner regresi sederhana pada data training
+
+lm.y <- lm(sales ~ youtube,
+           data = trainingset)
+summary(lm.y)
+```
+
+Berdasarkan output diatas bisa dijelaskan bahwa:
+Persamaan regresi linernya adalah
+
+$$sales = 8.215839 + 0.049680*youtube$$
+
+Misal youtube = 3500
+
+```{r}
+sales.y = 8.215839 + (0.049680*3500)
+sales.y
+```
+
+## Visualasi hasil data training youtube
+```{r}
+ggplot() + geom_point(aes(x = trainingset$youtube,
+                          y = trainingset$sales), colour = 'red') +
+  geom_line(aes(x = trainingset$youtube,
+                y = predict(lm.y, newdata = trainingset)), colour = 'blue') +
+  ggtitle('Pengaruh Youtube terhadap Sales (Data Training)') +
+  xlab('youtube') +
+  ylab('sales')
+```
+
+## Prediksi model regresi dengan data testing
+```{r}
+yprediksi.y <- predict(lm.y, newdata = testingset)
+head(yprediksi.y)
+```
+
+## Visualasi hasil data testing
+```{r}
+ggplot() + geom_point(aes(x = testingset$youtube,
+                          y = testingset$sales), colour = 'red') +
+  geom_line(aes(x = testingset$youtube,
+                y = predict(lm.y, newdata = testingset)), colour = 'blue') +
+  ggtitle('Pengaruh Youtube terhadap Sales (Data Testing)') +
+  xlab('Youtube') +
+  ylab('Sales')
+```
+
+**Latihan**
+## Evaluasi
+Lakukan evaluasi dari model yang sudah dibuat dengan menggunakan SSE, MSE dan R-Squared
+```{r}
+# Evaluasi SSE youtube terhadap sales
+
+sse_y <- sum(lm.y$residuals^2)
+cat("Sum of Squared Errors (SSE):", sse_y, "\n")
+
+```
+```{r}
+# Evaluasi RSquare youtube terhadap sales
+model.summary_y <- summary(lm.y)
+r_squared_y <- model.summary_y$r.squared
+cat("R-squared:", r_squared_y, "\n")
+
+```
+```{r}
+# Evaluasi MSE youtube terhadap sales
+mse_y <- mean(lm.y$residuals^2)
+cat("Mean Squared Error (MSE):", mse_y, "\n")
+
+```
+
+
+2. Model Regresi Newspaper terhadap Sales
+
+Buatlah model regresi untuk hubungan varibel `newspaper` terhadap variabel `sales`
+
+```{r}
+# Melihar korelasi newspaper dengan sales
+
+kornewspaper <- cor(marketing$newspaper, marketing$sales)
+kornewspaper
+
+
+```
+
+Persamaan regresi liner antara `newspaper` dengan `sales`
+
+$$Sales = \beta_0 + \beta_1.newspaper + \varepsilon$$
+```{r}
+# Model regresi liner newspaper terhadap sales
+lm.n <- lm(sales ~ newspaper, 
+           data = trainingset)
+summary(lm.n)
+
+```
+$$Sales = 14.44853 + 0.07067 * newspaper + \varepsilon$$
+Misal nilai newspapernya: 3500
+maka nilai:
+
+```{r}
+sales_n = 14.44853 + (0.07067 * 3500)
+sales_n
+```
+## Visualasi hasil data training newspaper
+```{r}
+ggplot() + geom_point(aes(x = trainingset$newspaper,
+                          y = trainingset$sales), colour = 'red') +
+  geom_line(aes(x = trainingset$newspaper,
+                y = predict(lm.n, newdata = trainingset)), colour = 'blue') +
+  ggtitle('Pengaruh Newspaper terhadap Sales (Data Training)') +
+  xlab('newspaper') +
+  ylab('sales')
+```
+## Prediksi model dengan data testing
+```{r}
+prediksi.n <- predict(lm.n, newdata = testingset)
+head(prediksi.n)
+```
+## Visualasi hasil data testing
+```{r}
+ggplot() + geom_point(aes(x = testingset$newspaper,
+                          y = testingset$sales), colour = 'red') +
+  geom_line(aes(x = testingset$newspaper,
+                y = predict(lm.n, newdata = testingset)), colour = 'blue') +
+  ggtitle('Pengaruh Newspaper terhadap Sales (Data Testing)') +
+  xlab('Newspaper') +
+  ylab('Sales')
+```
+## Evaluasi model
+
+```{r}
+# Evaluasi SSE newspaper terhadap sales
+
+sse_n <- sum(lm.n$residuals^2)
+cat("Sum of Squared Errors (SSE)", sse_n, "\n")
+
+```
+```{r}
+# Evalusasi RSquare newpaper terhadap sales
+model.summary_n = summary(lm.n)
+r_squared_n <- model.summary_n$r.squared
+cat("R-squared:", r_squared_n, "\n")
+
+```
+```{r}
+# Evaluasi MSE newspaper terhadap sales
+mse_n <- mean(lm.n$residuals^2)
+cat("Mean Squared Error (MSE):", mse_n, "\n")
+
+```
+
+```{r}
+model_performance <- data.frame(
+  No = c(1:3),
+  Variable = c("FACEBOOK", "YOUTUBE", "NEWSPAPER"),
+  SSE = c(sse_f, sse_y, sse_n),
+  Rquare = c(r_squared_f, r_squared_y, r_squared_n),
+  MSE = c(mse, mse_y, mse_n),
+  stringsAsFactors = FALSE
+
+)
+
+model_performance
+  
+```
+
+**Kesimpulan**: Berdasarkan 3 variabel prediktor yaitu facebook, youtube, dan newspaper yang paling berpengaruh terhadap peningkatakn penjualan adalah variabel youtube. Hal ini bisa dijelaskan dari nilai evaluasi SSE dan MSE bahwa model youtube lebih kecil dan RSquare lebih besar dibandingkan dengan model regresi dari 2 variabel lainnya.
