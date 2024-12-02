@@ -1,0 +1,298 @@
+---
+title: "Modul-10 Regresi Logistik"
+author: "Roni Yunis"
+date: '2023-12-18'
+output:
+---
+
+**Regresi Logistik** adalah model statistika yang dapat digunakan untuk menganalisis pola hubungan antara sekumpulan variabel independen dengan suatu variabel dependen bertipe kategorik atau kualitatif. **Regresi logistik** adalah suatu metode statistik yang digunakan untuk memodelkan hubungan antara satu atau lebih variabel independen (prediktor) dengan variabel dependen biner (hasil yang hanya memiliki dua kemungkinan nilai, misalnya 0 dan 1). Regresi logistik umumnya digunakan untuk menganalisis hubungan antara variabel-variabel tersebut dan untuk memprediksi probabilitas terjadinya suatu peristiwa tertentu.
+
+**Regresi logistik memanfaatkan fungsi logistik (atau sigmoid) untuk memetakan nilai-nilai prediktor ke dalam rentang antara 0 dan 1**. Fungsi logistik ini membentuk kurva S-shaped, sehingga cocok untuk memodelkan probabilitas. Model regresi logistik mengestimasi koefisien-koefisien yang menggambarkan kontribusi relatif setiap variabel independen terhadap log-odds atau logit dari kejadian sukses.
+
+Berbeda dengan regresi linear, di mana variabel dependen dapat memiliki nilai kontinu, regresi logistik lebih sesuai untuk kasus di mana variabel dependen bersifat biner atau kategorikal. Beberapa contoh penerapan regresi logistik meliputi prediksi peluang keberhasilan atau kegagalan suatu peristiwa, seperti prediksi apakah seseorang akan membeli suatu produk, mengikuti suatu program, atau mengalami suatu kondisi medis.
+
+Regresi logistik merupakan salah satu alat analisis yang umum digunakan dalam statistika, ilmu data, dan machine learning untuk memodelkan dan memahami hubungan antar variabel dalam situasi di mana variabel dependen bersifat biner.
+
+# Load packages
+```{r}
+#library dplyr + ggplot2 + lubridate
+
+library (tidyverse)
+
+```
+
+# Import Data
+data yang digunakan adalah dataset diabetes.csv. Dataset ini berisikan beberapa variabel yaitu: data `Pregnancies`, `Glucose`, `BloodPressure`, `SkinThickness`, `Insulin`, `BMI`, `DiabetesPedigreeFunction`, `Age`, dan `Outcome`
+
+```{r}
+data <- read.csv("data/diabetes.csv")
+head(data)
+```
+
+## Melihat ringkasan data
+
+```{r}
+summary(data)
+```
+Bisa dilihat bahwa, tidak ada data NA's dalam data yang akan digunakan.
+
+```{r}
+colSums(is.na(data))
+```
+
+## Melihat struktur data
+
+```{r}
+glimpse(data)
+```
+Bisa dilihat bahwa 8 buah variabel bertipe data numerik dan ada 1 variabel (`Outcome`) yang bertipe kategorikal (kategorik). Kita asumsikan 1 = Yes, dan 0 = No, jadi bisa disimpulkan variabel dependen (respon) adalah `Outcome`. Untuk variabel yang lain adalah variabel independen (prediktor). 
+
+**Problem**:
+Kita akan prediksi, variabel-variabel apa saja yang mempengaruhi seseorang terkena diabetes (Outcome = 1).
+
+## Visualiasi data
+kita akan memvisualisasi salah satu data numerik/integer, misalnya kita akan memvisualisasi variabel `DiabetePedigreeFunction` dengan menggunakan Histogram
+
+```{r}
+par(mfrow=c(4,2))
+ggplot(data, aes(data[,7],fill=..count..)) + 
+      geom_histogram(aes(y=..density..)) +
+      geom_density(alpha=.2, fill="purple")
+```
+Sekarang kita akan memvisualisasi data `outcome` yang kategorikal (1 atau 0) dengan mengunakan pie chart
+
+```{r}
+YES <- sum(data$Outcome == 1)
+NO <- sum(data$Outcome == 0)
+slices <- c(YES,NO)
+lbls <- c("Teridentifikasi","Tidak Teridentifikasi")
+lbls <- paste(lbls, slices)
+lbls <- paste(lbls)
+  pie(slices,labels = lbls, col=rainbow(length(lbls)),
+    main="Pie Chart of Diabetes")
+```
+# Menghitung korelasi antar variabel
+Dalam kasus ini kita akan menghitung kolerasi antar variabel, untuk mengetahui apakah terdapat multikolinearitas antar variabel.
+
+```{r}
+cor(data[,1:8], method="spearman")
+```
+Berdasarkan korelasi dari setiap variabel dapat dilihat bahwa tidak ada hubungan yang melebihi dari 0.6, sehingga dapat disimpulkan bahwa berdasarkan nilai korelasi tidak terdapat multikolinearitas antar variabel. Jika di visualisasikan dengan scatterplot hasilnya akan seperti ini:
+
+```{r}
+plot(data[,1:8], col=data$Outcome)
+```
+# Analisis Regresi Logistik
+## Model 1
+
+```{r}
+logit1 <- glm(Outcome~., data = data, family = binomial(link="logit"))
+summary(logit1)
+```
+Berdasarkan dari Model 1 masih ditemui variabel yang tidak berpengaruh signifikan terhadap model, karena nilai p-value > α=5% sehingga variabel yang tidak berpengaruh harus dihilangkan. Mengeliminasi variabel prediktor dengan cara backward. Untuk langkah selanjutnya adalah menghilangkan variabel `Age`
+
+## Model 2
+
+```{r}
+logit2 <- glm(Outcome~Pregnancies+Glucose+BloodPressure+
+                      SkinThickness+Insulin+BMI+DiabetesPedigreeFunction, data = data, family = binomial(link="logit"))
+summary(logit2)
+
+```
+Pada model ini masih ditemukan variabel yang tidak signifikan, sehingga perlu dilakukan eliminasi pada variabel `Insulin`.
+
+## Model 3
+
+```{r}
+logit3 <- glm(Outcome~Pregnancies+Glucose+BloodPressure+
+                      SkinThickness+BMI+DiabetesPedigreeFunction, data = data, family = binomial(link="logit"))
+summary(logit3)
+```
+Dalam model ke 3 ini variabel `SkinThickness` tidak berpengaruh signifikan terhadap model, sehingga perlu dihilangkan untuk mencari model selanjutnya.
+
+## Model 4
+
+```{r}
+logit4 <- glm(Outcome~Pregnancies+Glucose+BloodPressure+
+                      BMI+DiabetesPedigreeFunction, data = data, family = binomial(link="logit"))
+summary(logit4)
+```
+Bisa dilihat bahwa pada Model 4, nilai p-value pada semua variabel sudah berpengaruh signifikan, karena nilai p-value< 0,05.Sehingga bisa dilanjutkan ketahap berikutnya
+
+# Memilih model regresi terbaik
+Metode yang dapat digunakan untuk memilih model regresi terbaik adalah metode AIC dan SIC. 
+AIC (Akaike Information Criterion) dan SIC (Schwarz Information Criterion), juga dikenal sebagai BIC (Bayesian Information Criterion), adalah dua metrik yang digunakan untuk mengevaluasi dan membandingkan kualitas relatif dari model statistik yang berbeda. Kedua kriteria ini sering digunakan dalam konteks pemilihan model untuk membantu memilih model yang paling sesuai atau optimal.
+
+Model regresi terbaik apabila memiliki nilai AIC terkecil. Sekarang kita akan menghitung berapa nilai AIG dari masing-masing model tersebut.
+
+```{r}
+model_AIC <- c("Model_1","Model_2","Model_3","Model_4")
+AIC <- c(logit1$aic,logit2$aic,logit3$aic,logit4$aic)
+kriteria <- data.frame(model_AIC,AIC)
+kriteria 
+```
+Dari hasil output diatas dapat dilihat bahwa Model 4 merupakan model yang terbaik karena memiliki nilai AIC terkecil yaitu 740.5596.
+
+**Latihan**
+Lakukan secara mandiri, berapakah nilai metrik SIC dari model?
+
+```{r}
+#your code
+# Jumlah observasi (gantilah dengan jumlah observasi sesuai data Anda)
+nobs <- nrow(data)
+
+# Jumlah parameter untuk masing-masing model (gantilah dengan jumlah parameter sesuai model Anda)
+df <- c(9,8,7,6)
+
+# Menghitung SIC
+SIC <- AIC + (df * log(nobs)) / 2
+
+# Menambahkan hasil BIC ke dalam dataframe
+kriteria$SIC <- SIC
+
+# Menampilkan hasil
+kriteria
+
+
+```
+
+
+
+
+# Goodness of Fit (Kebaikan Model)
+
+Salah satu cara untuk menentukan kebaikan model adalah dengan Log-likelihood ratio test (uji rasio log-likelihood). Test ini adalah salah satu cara untuk mengevaluasi goodness of fit pada model regresi logistik. Dalam hal ini:
+
+- Jika nilai mendekati 0, itu menunjukkan bahwa model referensi lebih sesuai atau tidak lebih buruk dibandingkan model yang lebih kompleks.
+
+- Jika nilai mendekati 1, itu menunjukkan bahwa model referensi kurang sesuai dan model yang lebih kompleks.
+
+Kesimpulannya adalah, semakin kecil nilai (1 - rasio likelihood), semakin baik model referensi tersebut sesuai dengan data.
+
+```{r}
+logitfinal <- glm(Outcome~1, data=data, family =binomial(link="logit"))
+       1-as.vector(logLik(logit4)/logLik(logitfinal)) 
+```
+Dari hasil output diatas bisa disimpulkan bahwa Model_4 sudah memenuhi asumsi _goodness of fit_. 
+
+Selanjutnya adalah menghitung nilai VIF. VIF (Variance Inflation Factor) adalah ukuran yang digunakan dalam analisis regresi untuk menilai sejauh mana tingkat variabilitas (variansi) suatu koefisien regresi dapat disebabkan oleh ketergantungan dengan variabel prediktor lain dalam model. VIF membantu mendeteksi multicollinearity, yaitu kondisi ketika dua atau lebih variabel prediktor dalam model memiliki ketergantungan yang tinggi satu sama lain.
+
+VIF dihitung untuk setiap variabel prediktor dalam model regresi dan memberikan indikasi seberapa besar variabilitas koefisien regresi variabel tersebut diperbesar karena ketergantungan dengan variabel lain dalam model. Semakin tinggi nilai VIF, semakin besar tingkat multicollinearity.
+
+Tingkat Multicollinearity:
+
+- Jika VIF = 1, itu menunjukkan tidak adanya ketergantungan antara variabel prediktor.
+- Jika VIF > 1, tetapi kurang dari 5, itu mengindikasikan tingkat ketergantungan yang moderat.
+- Jika VIF > 5, itu menunjukkan tingkat ketergantungan yang tinggi, dan ini dapat menjadi masalah serius.
+
+
+
+```{r}
+library(car)
+vif(logit4)
+```
+
+Berdasarkan hasil perhitungan diperoleh nilai VIF untuk seluruh variabel prediktor dalam Model_4 < 5, sehingga asumsi multikolinearitas terpenuhi (tidak terjadi multikolinearitas antar variabel). Jadi bisa disimpulkan bahwa variabel `Pregnancies`, `Glucose`, `BloodPressure`, `BMI`, dan `DiabetesPredigreeFunction` berpengaruh signifikan terhadap `Outcome`
+
+# Latihan
+Berdasarkan kasus diatas, cobalah anda lakukan klasifikasi untuk mengidentifikasi pasien yang terkena diabetes dan yang tidak terkena diabetes serta lakukan evaluasi atas model klasifikasi yang sudah dihasilkan. Partisilah data ke dalam data training dan data testing.
+
+```{r}
+# Load Library
+
+library(caret) # libary partiisi data
+library(randomForest) # library klasifikasi Random Forest
+```
+
+
+```{r}
+# Membagi Dataset
+set.seed(100) #pengambilan data secara random
+
+#untuk data training diambil 70%, sisanya untuk data testing, berdasarkan variabel outcome
+index_train <- createDataPartition(data$Outcome,
+                                   p = 0.8,list = FALSE)
+
+data.train <- data[index_train,] # 80% untuk data training
+data.test <- data[-index_train,] # sisanya atau 30% untuk data testing
+```
+
+```{r}
+dim(data.train)
+dim(data.test)
+```
+```{r}
+## Memodelkan klasifikasi
+
+set.seed(123) #menentukan nilai acak dari data
+
+modelForest <- randomForest(data=data.train,
+               as.factor(Outcome)~.,
+               ntree=400, mtry=3)
+
+modelForest
+```
+Dari mode dapat dilihat bahwa tingkat kesalahan adalah 22.93%, dengan akurasi sebesar 77.07%
+
+**Latihan**
+Lakukan tuning hyperparameter untuk meningkatkan kinerja dari model.
+
+```{r}
+# your code
+
+
+
+```
+
+
+
+```{r}
+prediksiForest <- predict(modelForest, data.test)
+head(prediksiForest, 20)
+```
+```{r}
+head(data.test$Outcome,20)
+```
+
+```{r}
+plot(prediksiForest)
+```
+```{r}
+conf_Matrix <- table(prediksiForest, data.test$Outcome)
+conf_Matrix
+```
+
+**Latihan**
+Evaluasi model Klasifikasi dengan `Accuracy`, `Precision`, dan `Recall`
+
+```{r}
+# your code
+cm <-  table(data.test[,9], prediksiForest)
+
+accuracy <- confusionMatrix(cm)$overall["Accuracy"]
+precision <- confusionMatrix(cm)$byClass["Precision"]
+sensitivity <- confusionMatrix(cm)$byClass["Sensitivity"]
+F1 <- confusionMatrix(cm)$byClass["F1"]
+
+#Menampilkan hasil evaluasi 
+accuracy
+precision
+sensitivity
+F1
+
+```
+```{r}
+# Visualisasi kurva ROC
+library(pROC)
+
+
+roc_curve <- roc(data.test$Outcome, as.numeric(prediksiForest))
+plot(roc_curve, main = "ROC Curve", col = "blue", lwd = 2)
+```
+**Interpretasi dan Kesimpulan:** 
+
+- Nilai akurasi Anda adalah 0.7581699, yang berarti model Anda berhasil mengklasifikasikan dengan benar sekitar 74.5% dari seluruh instance.
+- Nilai precision Anda adalah 0.8673469, yang berarti sekitar 86.7% dari instance yang diklasifikasikan sebagai positif oleh model adalah benar-benar positif.
+- Nilai sensitivity Anda adalah 0.7657658, yang berarti model Anda berhasil mengidentifikasi sekitar 76.57% dari semua instance yang sebenarnya positif.
+- Nilai F1 score Anda adalah 0.8133971, yang menunjukkan keseimbangan yang baik antara precision dan recall.
+- Model ini memiliki kinerja yang baik secara umum, dengan akurasi yang lumayan dan keseimbangan yang baik antara precision dan recall.
