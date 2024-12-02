@@ -43,6 +43,8 @@ Anda mengumpulkan data dari sejumlah transaksi dan kemudian menggunakan regresi 
 
 # Contoh Implementasi dengan R
 
+library (tidyverse) = dplyr + ggplot2 + lubridate
+
 ## Load Packages
 ```{r}
 #Split dataset 
@@ -131,20 +133,20 @@ lm.r <- lm(sales ~ facebook,
            data = trainingset)
 summary(lm.r)
 ```
-Nilai P-Value = 0.00000000000000057
+Nilai P-Value = 0.000000003184 < 0.05 (sangat signifikan)
+
+$$Sales = \beta_0 + \beta_1facebook + \varepsilon$$
 
 
-
-
-$$Sales = 10.89708 + 0.21956.facebook + \varepsilon$$ 
+$$Sales = 11.02329 + 0.20290.facebook + \varepsilon$$ 
 
 Misalnya facebooknya Rp. 3500, berapakah nilai penjualan (sales)?
 Persamaan regresi linernya adalah:
 
-$$Sales = 10.89708 + (0.21956 * 3500) + \varepsilon$$ 
+$$Sales = 11.02329 + (0.20290*3500) + \varepsilon$$ 
 
 ```{r}
-sales_f = 10.89708 + (0.21956 * 3500)
+sales_f = 11.02329 + (0.20290*3500)
 sales_f
 ```
 Kalau kita lihat dari model diatas bahwa facebook punya hubungan signifikan terhadap penjualan, artinya nilai penjualan dapat ditingkatkan dari anggaran iklan pada facebook. 
@@ -240,16 +242,18 @@ lm.y <- lm(sales ~ youtube,
            data = trainingset)
 summary(lm.y)
 ```
+nilai p-value = 0.00000000000000022 (kecil dari 0,05) -> sangat signifikan
+
 
 Berdasarkan output diatas bisa dijelaskan bahwa:
 Persamaan regresi linernya adalah
 
-$$sales = 8.215839 + 0.049680*youtube$$
+$$sales = 8.403306 + 0.048109*youtube$$
 
 Misal youtube = 3500
 
 ```{r}
-sales.y = 8.215839 + (0.049680*3500)
+sales.y = 8.403306 + (0.048109*3500)
 sales.y
 ```
 
@@ -329,12 +333,12 @@ lm.n <- lm(sales ~ newspaper,
 summary(lm.n)
 
 ```
-$$Sales = 14.44853 + 0.07067 * newspaper + \varepsilon$$
+$$Sales = 14.70610 + 0.05228 * newspaper + \varepsilon$$
 Misal nilai newspapernya: 3500
 maka nilai:
 
 ```{r}
-sales_n = 14.44853 + (0.07067 * 3500)
+sales_n = 14.70610 + (0.05228 * 3500)
 sales_n
 ```
 ## Visualasi hasil data training newspaper
