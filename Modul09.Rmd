@@ -249,14 +249,14 @@ Fit Model 1
 library(glm2)
 
 # model GLM untuk memprediksi variabel sales pada data training
-model_glm_1 <- glm(sales ~ youtube + facebook + newspaper, data = trainingset, 
+model_glm <- glm(sales ~ youtube + facebook + newspaper, data = trainingset, 
                  family = gaussian(link = "identity"), # distribusi probabilitas dari variabel respons
                  control = list(epsilon = 1e-8, # nilai batasan toleransi kesalahan (0.00000001)
                                 maxit =100)     # jumlah iterasi
                  )
 
 # melihat hasil model prediksi
-summary(model_glm_1)
+summary(model_glm)
 ```
 
 **Latihan**
@@ -265,11 +265,11 @@ Coba diidentifikasi jenis family secara umum dalam GLM?, kemudian coba implement
 
 ## Prediksi data testing dengan model
 ```{r}
-# Melakukan prediksi produksi dengan model GLM pada data testing
-predicted_glm_1 <- predict(model_glm_1, newdata = testingset, type = "response")
+# Melakukan prediksi sales dengan model GLM pada data testing
+predicted_glm <- predict(model_glm, newdata = testingset, type = "response")
 
 # Menampilkan hasil prediksi
-head(predicted_glm_1)
+head(predicted_glm)
 ```
 
 
@@ -282,7 +282,7 @@ head(testingset$sales)
 # Visualisasi Hasil
 result_data_glm <- data.frame(sales = testingset$sales, Predictions = predicted_glm_1)
 
-# Visualisasi Perbandingan Produksi Aktual dengan Hasil Prediksi
+# Visualisasi Perbandingan Sales Aktual dengan Hasil Prediksi
 ggplot(data = result_data_glm, aes(x = sales, y = Predictions)) +
   geom_point() +
   geom_abline(intercept = 0, slope = 1, color = "red", linetype = "dashed") +
@@ -294,7 +294,7 @@ ggplot(data = result_data_glm, aes(x = sales, y = Predictions)) +
 ```
 
 ```{r}
-# Visualisasi Produksi Aktual dengan Hasil Prediksi
+# Visualisasi Sales Aktual dengan Hasil Prediksi
 ggplot(data = result_data_glm, aes(x = 1:length(sales))) +
   geom_line(aes(y = sales, color = "Actual"), size = 1) +
   geom_line(aes(y = Predictions, color = "GLM Prediction"), size = 1) +
@@ -357,9 +357,6 @@ cat(paste("MAPE: ", mape_value_glm_1, "%\n"))
 
 Fit Model 2
 ```{r}
-# library model GLM
-#library(glm2)
-
 # model GLM untuk memprediksi variabel sales pada data training
 model_glm_2 <- glm(sales ~ youtube + facebook + newspaper, data = trainingset, 
                  family = gaussian(link = "identity"), # distribusi probabilitas dari variabel respons
@@ -373,7 +370,7 @@ summary(model_glm_2)
 
 
 ```{r}
-# Melakukan prediksi produksi dengan model GLM pada data testing
+# Melakukan prediksi sales dengan model GLM pada data testing
 predicted_glm_2 <- predict(model_glm_2, newdata = testingset, type = "response")
 
 # Menampilkan hasil prediksi
@@ -385,7 +382,7 @@ head(predicted_glm_2)
 # Visualisasi Hasil
 result_data_glm_2 <- data.frame(sales = testingset$sales, Predictions = predicted_glm_2)
 
-# Visualisasi Perbandingan Produksi Aktual dengan Hasil Prediksi
+# Visualisasi Perbandingan sales Aktual dengan Hasil Prediksi
 ggplot(data = result_data_glm_2, aes(x = sales, y = Predictions)) +
   geom_point() +
   geom_abline(intercept = 0, slope = 1, color = "red", linetype = "dashed") +
@@ -398,7 +395,7 @@ ggplot(data = result_data_glm_2, aes(x = sales, y = Predictions)) +
 
 
 ```{r}
-# Visualisasi Produksi Aktual dengan Hasil Prediksi
+# Visualisasi sales Aktual dengan Hasil Prediksi
 ggplot(data = result_data_glm_2, aes(x = 1:length(sales))) +
   geom_line(aes(y = sales, color = "Actual"), size = 1) +
   geom_line(aes(y = Predictions, color = "GLM Prediction"), size = 1) +
@@ -410,8 +407,6 @@ ggplot(data = result_data_glm_2, aes(x = 1:length(sales))) +
 
 ```{r}
 # Evaluasi GLM Model
-#library(Metrics)
-
 
 # Hitung MAE (Mean Absolute Error)
 mae_value_glm_2 <- mae(testingset$sales, predicted_glm_2)
