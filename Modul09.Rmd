@@ -280,7 +280,7 @@ head(testingset$sales)
 ## Visualisasi Hasil Prediksi
 ```{r}
 # Visualisasi Hasil
-result_data_glm <- data.frame(sales = testingset$sales, Predictions = predicted_glm_1)
+result_data_glm <- data.frame(sales = testingset$sales, Predictions = predicted_glm)
 
 # Visualisasi Perbandingan Sales Aktual dengan Hasil Prediksi
 ggplot(data = result_data_glm, aes(x = sales, y = Predictions)) +
@@ -336,16 +336,16 @@ library(Metrics)
 
 
 # Hitung MAE (Mean Absolute Error)
-mae_value_glm_1 <- mae(testingset$sales, predicted_glm_1)
+mae_value_glm_1 <- mae(testingset$sales, predicted_glm)
 
 # Hitung MSE (Mean Squared Error)
-mse_value_glm_1 <- mse(testingset$sales, predicted_glm_1)
+mse_value_glm_1 <- mse(testingset$sales, predicted_glm)
 
 # Hitung RMSE (Root Mean Square Error)
-rmse_value_glm_1 <- rmse(testingset$sales, predicted_glm_1)
+rmse_value_glm_1 <- rmse(testingset$sales, predicted_glm)
 
 # Hitung MAPE (Mean Absolute Percent Error)
-mape_value_glm_1 <- mape(testingset$sales, predicted_glm_1)
+mape_value_glm_1 <- mape(testingset$sales, predicted_glm)
 
 # Tampilkan hasil evaluasi
 cat(paste("MAE: ", mae_value_glm_1, "\n"))
