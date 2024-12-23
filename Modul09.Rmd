@@ -1,7 +1,7 @@
 ---
 title: "Modul 09 - Multiple Linear Regression"
 author: "Roni Yunis"
-date: "12/11/2023"
+date: "12/09/2024"
 output: pdf_document
 ---
 
@@ -149,8 +149,8 @@ Model regresinya akan kita simpan kedalam objek *liner*
 liner_1 <- lm(sales ~ youtube + facebook + newspaper, data = marketing)
 summary(liner_1)
 ```
-p-value youtube terhadap sales = 0.00000000000000022 < 0.05 (signifikan)
-p-value facebook terhadap sales = 0.00000000000000022 < 0.05 (signifikan)
+p-value youtube terhadap sales = 0.0000000000000002 < 0.05 (sangat signifikan)
+p-value facebook terhadap sales = 0.0000000000000002 < 0.05 (sangat signifikan)
 
 Langkah pertama yang dapat kita gunakan untuk menafsirkan analisis regresi berganda yang sudah kita lakukan, adalah memeriksa nilai statik F dan nilai p yang terkait, hal ini bisa kita lihat pada baris terakhir dari hasil model regresi. Dalam contoh kali ini, didapat bahwa nilai p-value dari F-Statistik adalah < 2.2e-16 (0.00000000000000022) , artinya nilai ini adalah sangat signifikan. Jadi bisa disimpulkan bahwa salah satu dari variabel prediktor (independen) berhubungan secara signifikan dengan variabel hasil (dependen).
 

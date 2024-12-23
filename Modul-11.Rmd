@@ -1,0 +1,475 @@
+---
+title: "Modul 11 - Analisis Big Data: Time Series Forecasting"
+author: "Roni Yunis"
+date: "23/12/2024"
+output:
+---
+
+# Pengantar
+
+**Big Data:**
+Big Data merujuk pada volume besar dan kompleks data yang tidak dapat secara efektif diolah atau dikelola menggunakan metode tradisional pemrosesan data. Data dalam skala besar ini seringkali berasal dari berbagai sumber, termasuk transaksi bisnis, media sosial, sensor IoT (Internet of Things), rekaman log, dan data lainnya. Big Data memiliki tiga karakteristik utama yang dikenal sebagai 3V: Volume (volume besar data), Variety (keragaman jenis data), dan Velocity (kecepatan pengumpulan dan pemrosesan data).
+
+**Tren Big Data di Masa Depan:**
+
+1. **Peningkatan Penggunaan Kecerdasan Buatan (AI) dan Machine Learning (ML):** Di masa depan, AI dan ML akan semakin mendominasi pengolahan dan analisis Big Data. Ini akan memungkinkan sistem untuk secara otomatis mengidentifikasi pola, tren, dan wawasan yang lebih dalam dari data berskala besar.
+
+2. **Integrasi Big Data dengan Internet of Things (IoT):** Seiring dengan pertumbuhan IoT, akan ada integrasi yang lebih erat antara Big Data dan data yang dihasilkan oleh perangkat IoT. Ini akan memberikan pemahaman yang lebih baik tentang kinerja perangkat, pemantauan real-time, dan mendukung pengambilan keputusan yang lebih tepat waktu.
+
+3. **Keamanan dan Kepatuhan:**
+   - **Keamanan Data yang Lebih Canggih:** Dengan peningkatan ancaman keamanan, solusi keamanan data untuk melindungi informasi sensitif akan menjadi semakin canggih dan terintegrasi.
+   - **Kepatuhan Regulasi:** Dengan meningkatnya regulasi terkait privasi data, organisasi akan semakin berfokus pada kepatuhan dan manajemen risiko untuk memastikan bahwa mereka mematuhi aturan dan peraturan yang berlaku.
+
+4. **Edge Computing untuk Pengolahan Data di Tempat:** Seiring dengan peningkatan jumlah data yang dihasilkan oleh perangkat di edge devices, pengolahan data di tempat (edge computing) akan menjadi tren, mengurangi latensi dan memungkinkan pengambilan keputusan yang lebih cepat.
+
+5. **Penggunaan Quantum Computing:** Meskipun masih dalam tahap pengembangan, quantum computing memiliki potensi untuk mengubah paradigma dalam pengolahan data berskala besar dengan memecahkan masalah yang sulit atau bahkan tidak dapat dipecahkan oleh komputer klasik.
+
+6. **Pengembangan Infrastruktur Big Data yang Lebih Efisien:** Dengan meningkatnya kesadaran akan dampak lingkungan, akan ada peningkatan fokus pada pengembangan infrastruktur Big Data yang lebih efisien secara energi untuk mengurangi jejak karbon.
+
+Tren-tren ini mencerminkan evolusi Big Data sebagai disiplin yang terus berkembang, memanfaatkan teknologi baru untuk memberikan wawasan yang lebih dalam dan memberdayakan organisasi untuk membuat keputusan yang lebih cerdas dan cepat. 
+
+Salah satu bentuk data yang termasuk ke dalam big data adalah **Data Time Series**
+
+**Data Time Series** adalah data yang diperoleh dari pengamatan satu objek dari beberapa periode waktu. Misalnya data jumlah mahasiswa dari tahun ke tahun, data nilai tukar dolar terhadap rupiah dari hari ke hari, data kasus covid dari bulan januari 2020 sampai periode saat ini, dan masih banyak contoh yang lainnya.
+
+Time series analysis adalah teknik statistik yang digunakan untuk menganalisis data yang dikumpulkan atau diukur secara berurutan selama periode waktu tertentu. Data time series mencakup observasi atau pengukuran yang dilakukan dalam interval waktu yang teratur. Contoh umum dari time series data termasuk data keuangan harian, data penjualan bulanan, atau data suhu harian.
+
+Peran time series analysis dalam analisis big data sangat penting, terutama dalam konteks bisnis. Beberapa perannya melibatkan:
+
+1. **Prediksi dan Peramalan:** Time series analysis memungkinkan perusahaan untuk membuat prediksi dan peramalan berdasarkan data historis. Misalnya, perusahaan dapat menggunakan analisis time series untuk memprediksi penjualan di masa depan, permintaan pelanggan, atau tren pasar.
+
+2. **Optimasi Keputusan:** Dengan memahami pola dan tren dalam data time series, perusahaan dapat mengoptimalkan keputusan operasional. Ini mencakup penjadwalan produksi yang lebih baik, manajemen rantai pasokan yang efisien, atau penyesuaian harga yang tepat waktu, dan menetapkan strategi atau desain baru dari produk/service, atau rekomendasi produk baru, dll.
+
+3. **Deteksi Anomali:** Time series analysis membantu dalam mendeteksi anomali atau perubahan yang tidak biasa dalam data. Ini dapat membantu perusahaan mengidentifikasi masalah operasional atau potensi risiko lebih awal, seperti gangguan produksi atau perubahan perilaku pelanggan yang tidak biasa.
+
+4. **Pengelolaan Inventori:** Dengan memahami pola dalam data time series, perusahaan dapat mengelola inventori dengan lebih efisien, menghindari kekurangan atau kelebihan persediaan yang tidak perlu.
+
+5. **Optimasi Proses Bisnis:** Analisis time series dapat digunakan untuk mengoptimalkan proses bisnis, seperti waktu produksi atau waktu pelayanan pelanggan, dengan memahami pola waktu tertentu yang mungkin mempengaruhi efisiensi.
+
+Dengan memanfaatkan time series analysis dalam analisis big data, perusahaan dapat membuat keputusan yang lebih informasional, merencanakan strategi yang lebih baik, dan meningkatkan respons terhadap perubahan pasar atau keadaan bisnis.
+
+Untuk melakukan analisis time series tersebut ada banyak teknik/metode/algoritma/model yang dapat digunakan, berikut beberapa diantaranya:
+
+1. **ARIMA**, digunakan untuk tipe data stationary / random
+
+2. **ETS** (error, trend, seasonal), sangat mirip pendekatannya dengan prophet facebook, yaitu dengan komponen trend dan seasonality
+
+3. **Bayesian Structural Time Series (BSTS)**, baik digunakan ketika ada eksternal regressor (atau pengaruh eksternal dari series lain selain komponen time series itu sendiri)
+
+4. **TBATS**, model yang bisa digunakan ketika memodelkan “multiple seasonality” yaitu penggunaan 2 macam efek seasonality (misal weekly dan monthly), karena secara umum time series dianggap hanya memiliki 1 tipe seasonality
+
+5. **Prophet** adalah model yang dikembangkan oleh Facebook dan fokus pada komponen: trend, seasonality (bisa multiple), dan holiday effect. dll.
+
+Secara umum ada 3 komponen time series yaitu:
+
+- Seasonal : data musiman, data dengan pola yang berulang dengan periode yang tetap (tahun, bulan, minggu, hari, jam, detik)
+
+- Trend : ada 2 jenis trend yaitu cendrung naik atau cendrung turun
+
+- Error : data yang ditangkap oleh Seosonal atau trend yang tidak bisa dijelaskan.
+
+
+# Load Packages
+```{r}
+# Library untuk manipulasi data
+library (dplyr)
+# Library untuk visualisasi data
+library (ggplot2)
+library (plotly)
+# Library model time series forecasting
+library (prophet)
+# Library untuk split data
+library (caTools)
+# Library manipulasi tanggal
+library (lubridate)
+```
+
+# Data Preparation
+## Import Data
+```{r}
+sales <- read.csv("data/train.csv")
+head(sales)
+```
+
+## Melihat struktur data
+```{r}
+# melihat struktur dataset
+glimpse (sales)
+```
+
+# Exploratory Data Analysis
+## Menampilkan transaksi berdasarkan store
+```{r}
+group_sales <- group_by(sales, store)
+count(group_sales)
+```
+
+Bisa dilihat bahwa setiap store memiliki 73050 transaksi. 
+
+## Menampilkan jumlah transaksi berdasarkan tanggal
+Sekarang kita akan melihat jumlah transaksi berdasarkan tanggal transaksi dan kita simpan dalam objek `daily_demand`
+```{r}
+daily_demand <- sales %>% 
+  group_by(date) %>% 
+  summarise( 
+    demand=sum(sales)
+  )  
+daily_demand
+```
+
+## Menampilkan transaksi pada salah satu store
+Kita akan mengambil transaksi pada salah satu store saja, misalnya pada `store 3`. dan kita simpan dalam objek `daily_demandstore03` dan rubah data `date`ke type tanggal (date)
+
+```{r}
+daily_demandstore03 <- sales %>% 
+  filter (store == "3") %>%
+  mutate (date = as.Date(date)) %>% #merubah type data date
+  group_by(date) %>% 
+  summarise( 
+    demand=sum(sales)
+  ) 
+  
+daily_demandstore03
+```
+Bisa dilihat bahwa data `date` sudah dalam type tanggal
+
+
+## Visualisasi Data
+kita akan memvisualisasi trankasi pada store 03 dari tahun 2013 sampai 2016
+```{r}
+plotstore03 <- daily_demandstore03 %>% 
+  ggplot(aes(x = date, y = demand)) +
+  geom_point(color = "tomato3", group=1) + 
+  labs( 
+    title = "Daily Sales", 
+    subtitle = "Store 03", 
+    caption = "1C Company", 
+    x = "Date", 
+    y = "Total Sales" 
+  ) + 
+  theme_minimal() 
+  
+
+```
+
+
+```{r}
+ggplotly(plotstore03)
+```
+
+# Membuat Objek Time Series dengan Model Prophet
+Data yang digunakan yaitu data permintaan harian di Store 3 yang sudah disimpan pada objek `daily_demandstore03`
+
+```{r}
+daily_demandstore03
+```
+
+## Menyiapkan data
+Untuk menggunakan algoritma/model Prophet pertama-tama yang harus dilakukan adalah menyiapkan data frame dengan format: ds untuk menyimpan tanggal, dan y untuk menyimpan dari nilai yang akan prediksi.
+
+```{r}
+# Menyiapkan data
+train_daily_3 <- daily_demandstore03 %>% 
+  rename(
+    ds = "date",
+    y = "demand"
+    )
+glimpse(train_daily_3)
+```
+
+## Fit Model Data Training
+Melakukan pemodelan data training dengan menggunakan fungsi `fit.prophet()` dimana sebelumnya kita harus menentukan seasonality nya. dalam kasus ini kita mengggunakan `daily.seasonality`
+
+```{r}
+# fitting model data training
+model_ts <- prophet(daily.seasonality = TRUE, seasonality_prior_scale=0.1) %>% 
+  fit.prophet(train_daily_3)
+model_ts
+```
+
+Berdasarkan hasil fitting model diatas bisa dijelaslkan bahwa **model_ts** sekarang menyimpan informasi data permintaan harian pada store 03. Sehingga kita bisa gunakan untuk mengekstrak informasi deret waktu tersebut untuk melakukan perkiraan selama periode waktu yang bisa ditentukan. Misalnya kita akan memperkiraan permintaan penjualan untuk 1 tahun kedepan. Utuk melakukan ini kita harus menyiapkan data frame yang terdiri dari rentang waktu/tanggal mendatang yang akan diperkirakan. Untungnya dalam `prophet()` sudah menyediakan sebuah fungsi `make_future_dataframe()` memudahkan kita untuk menyiapkan data tersebut.
+
+```{r}
+range(train_daily_3$ds)
+```
+Bisa dilihat bahwa jangka waktu prediksi mulai dari 2013 s/d 2016
+
+
+## Menyiapkan tanggal untuk prediksi
+Periode prediksi adalah 1 tahun kedepan atau 365 hari
+
+```{r}
+# menyiapkan tanggal utk prediksi
+future_ts <- make_future_dataframe(model_ts, periods = 365, freq = "day")
+glimpse(future_ts)
+```
+
+## Visualisasi hasil forecasting untuk perkiraan data 1 tahun kedepan
+
+```{r}
+# visualisasi hasil forecasting
+forecast_ts <- predict(model_ts, future_ts)
+plot(model_ts, forecast_ts)
+```
+
+Bisa dilihat bahwa, gambar pada grafik yang berwarna biru menunjukkan hasil forecast yang sudah dilakukan. Titik hitam menunjukkan data dari mulai 2013 sampai 2016. Waktu biru yang tidak ada titik adalah perkiraan permintaan untuk 2017
+
+## Visualisasi komponen model
+Dengan prophet dimungkinkan kita memvisulisasikan berdasarkan trend, weekly, dan yearly.
+Default:
+- daily: sampling hourly, dan frequency 24
+- weekly: sampling daily, dan frequency 7
+- yearly: sampling daily dan frequency 365
+
+```{r}
+#visualiasi komponen model
+prophet_plot_components(model_ts, forecast_ts)
+```
+
+Berdasarkan hasil visualisasi diatas bisa disimpulkan sebagai berikut:
+
+- Penjualan dari tahun ke tahun meningkat, dimana penjualan di tahun 2017 adalah penjualan yang tertinggi
+- Penjualan terbanyak pada setiap bulan dan tahun cendrung mengalami peningkatan di hari weekend, yaitu hari Jumat, Sabtu dan Minggu, sementara penjualan di hari Senin adalah penjualan terendah dibandingakan dengn hari yang lain
+- Periode penjualan dalam setahun yang paling tinggi adalah pada bulan Juni, Juli dan Agustus, sedangkan tingkat penjualan terendah pada bulan Januari
+
+## forecast berdasarkan seasionality bulan
+
+```{r}
+# forecast berdasarkan seasionality month (bulan)
+model_ts_monthly <- prophet(changepoint.prior.scale = 0.05, 
+                    yearly.seasonality = FALSE) %>% 
+  add_seasonality(name = "monthly", period = 30.5, fourier.order = 3) %>% 
+  fit.prophet(train_daily_3) 
+future_ts_monthly <- make_future_dataframe(model_ts_monthly, periods = 365) 
+forecast_ts_monthly <- predict(model_ts_monthly, future_ts_monthly) 
+prophet_plot_components(model_ts_monthly, forecast_ts_monthly)
+```
+
+## Visualisasi trend permintaan
+
+Dalam kasus ini kita akan memvisualisasi tren permintaan dari awal tahun 2017 sampai akhir 2017
+
+```{r}
+#visualisasi dari tren awal 2017 sampai akhir 2017
+plot(model_ts_monthly, forecast_ts_monthly)
+```
+
+Bisa dilihat bahwa terjadi nya trend peningkatan permintaan yang relatif tinggi dibandingkan tahun sebelumnya
+
+## forecast berdasarkan seasionality penambahan holiday (hari libur)
+
+```{r}
+# Menetapkan hari libur mulai dari tahun 2013 sampai 2016, misal libur di hari natal 25 desember atau tahun baru setiap tanggal 31 desember
+holiday <- 
+  data.frame( 
+    holiday = "newyeareve", 
+    ds = dmy(c("31-12-2013","31-12-2014", "31-12-2015", "31-12-2016", "31-12-2017")), 
+    lower_window = -5, 
+    upper_window = 0 
+  ) 
+holiday 
+
+```
+
+
+```{r}
+# visualisasi hasil forecast dengan penambahan efek holiday
+model_ts_holiday <- prophet(changepoint.prior.scale = 0.05, 
+                    holidays = holiday) %>% 
+  add_seasonality(name = "monthly", period = 30.5, fourier.order = 5) %>% 
+  fit.prophet(train_daily_3) 
+future_ts_holiday <- make_future_dataframe(model_ts_holiday, periods = 365) 
+forecast_ts_holiday <- predict(model_ts_holiday, future_ts_holiday) 
+plot(model_ts_holiday, forecast_ts_holiday)
+```
+
+```{r}
+# melihat trend dan holiday effect dari perkiraan
+prophet_plot_components(model_ts_holiday, forecast_ts_holiday)
+```
+
+Berdasarkan hasil visualisasi diatas bisa disimpulkan sebagai berikut:
+
+1. Berdasarkan penjualan mingguan didapatkan bahwa penjualan meningkat diawal bulan
+2. Dengan menambahkan seasionality holiday didapatkan bahwa trend peningkatan penjualan berada pada akhir tahun yaitu dibulan desember-januari
+
+
+## Melihat hasil perkiraan berdasarkan trend dan seasonality
+
+```{r}
+forecast_ts %>%
+  select(ds, trend, weekly, yearly, yhat)
+```
+
+# Model fine Tuning untuk melihat trend liner dari permintaan
+
+Ini digunakan untuk melihat trend perkiraan dengan bentuk lain yaitu dengan menambahkan changepoint
+
+```{r}
+plot(model_ts, forecast_ts) + 
+  add_changepoints_to_plot(model_ts, threshold = 0) 
+```
+
+Garis merah putus-putus menunjukkan change point dari trend
+
+```{r}
+before_2017 <- daily_demandstore03 %>% 
+  mutate( 
+    year = year(date) 
+  ) %>% 
+  filter(year < 2017) %>% 
+  rename( 
+    ds = "date", 
+    y = "demand" 
+  ) 
+
+after_2017 <- daily_demandstore03 %>% 
+  mutate( 
+    year = year(date) 
+  ) %>% 
+  filter(year >= 2017) %>% 
+  rename( 
+    ds = "date", 
+    y = "demand" 
+  ) 
+ggplot(before_2017, aes(x=ds, y=y)) + 
+  geom_point() + 
+  theme_minimal()
+```
+
+```{r}
+# Model sebelum 2017 dan visualisasinya
+model_before_2017 <- prophet(yearly.seasonality = TRUE, 
+                             changepoint.prior.scale = 0.01) %>% 
+  fit.prophet(before_2017) 
+future_before_2017 <- make_future_dataframe(model_before_2017, periods = 365) 
+forecaset_before_2017 <- predict(model_before_2017, future_before_2017) 
+plot(model_before_2017, forecaset_before_2017) + 
+  add_changepoints_to_plot(model_before_2017) + 
+  geom_point(data = after_2017, aes(x = as.POSIXct(ds), y=y), color = "tomato3")
+```
+
+```{r}
+# Melihat transaksi paling banyak dalam satu minggu
+forecast_ts %>% 
+  mutate( 
+    weekday = wday(ds, label = TRUE), 
+    weekly = round(weekly, 5) 
+  ) %>% 
+  filter(ds <= max(daily_demandstore03$date)) %>% 
+  select(weekday, weekly) %>% 
+  distinct() %>% 
+  arrange(-weekly)
+```
+
+```{r}
+# Visualisasi Model Sebelum Tahun 2017 berdasarkan hari dalam satu minggu
+daily_demandstore03 %>% 
+  mutate( 
+    wday = wday(date, label = TRUE) 
+  ) %>% 
+  ggplot(aes(x=date, y=demand)) + 
+  geom_point(aes(color=wday)) 
+```
+
+Berdasarkan visualisasi diatas dapat disumpulan bahwa penjualan tertinggi pada tiap tahun ada pada hari Jumat, Sabtu dan Minggu
+
+# Model Evalution
+Untuk melakukan evaluasi dari model yang sudah disiapkan, maka kita bisa menguji model tersebut pada data testing.
+
+```{r}
+# Menyiapkan data
+test <- read.csv("data/test.csv")
+glimpse(test)
+```
+ada 182500 baris dan 4 kolom untuk data testing
+
+```{r}
+# Merubah type data tanggal menjadi date
+test %>% 
+  mutate (date = as.Date(date)) %>%
+  group_by(date) %>% 
+  summarise( 
+    demand=sum(sales)
+  )
+
+```
+
+Bisa dilihat bahwa semua data testing ada pada tahun 2017.
+
+Kita akan bandingkan data set Test dengan data set Training utk data sebelum tahun 2018, karena data train hanya sampai akhir 2016
+
+```{r}
+cutoff <- dmy("01-01-2016") 
+train <- daily_demandstore03 %>% 
+  filter( 
+    date < cutoff 
+  ) %>% 
+  rename( 
+    "ds" = date, 
+    "y" = demand 
+  ) 
+test <- daily_demandstore03 %>% 
+  filter( 
+    date >= cutoff 
+  ) %>% 
+  rename( 
+    "ds" = date, 
+    "y" = demand 
+  ) 
+ggplot(daily_demandstore03, aes(x=date, y=demand)) + 
+  geom_point(data = train, aes(x=ds, y=y)) + 
+  geom_point(data = test, aes(x=ds, y=y), color="tomato3")
+```
+
+Warna hitam adalah data training dan warna merah adalah data testing
+
+## Model Final
+Model final digunakan untuk mempredisi data testing
+
+```{r}
+# Menyiapkan model final
+model_final <- prophet(changepoint.prior.scale = 0.05, 
+                       yearly.seasonality = TRUE, 
+                       holidays = holiday) %>% 
+  add_seasonality(name = "monthly", period = 30.5, fourier.order = 5) %>% 
+  fit.prophet(train) 
+future_final <- make_future_dataframe(model_final, periods = nrow(test) + 1) 
+forecast_final <- predict(model_final, future_final) 
+plot(model_final, forecast_final)
+```
+
+## Visual Model Final dengan data testing
+
+```{r}
+plot(model_final, forecast_final) + 
+  geom_point(data = test %>% 
+               mutate(ds = as.POSIXct(ds)), aes(x=ds, y=y), color="tomato3")
+```
+
+Bisa dilihat bahwa model dapat memprediksi data testing dan sama dengan trend yang sudah diperkirakan sebelumnya.
+
+
+# Menghitung Akurasi dari Model
+Untuk menentukan tingkat akurasi model, biasanya menghitung terlebih dulu nilai MAPE dari model. MAPE adalah Mean Absolute Persentase Error biasanya digunakan mengavaluasi model deret waktu.
+
+```{r}
+eval <- test %>% 
+  mutate( 
+    ds = as.POSIXct(ds) 
+  ) %>% 
+  left_join(forecast_final) %>% 
+  select(ds, y, yhat, yhat_upper, yhat_lower) 
+eval 
+```
+
+Untuk mendapatkan nilai mape kita harus mengurangi nilai sebenarnya dengan nilai yang ada pada data testing (yhat) yang ada dalam data frame `forecast_final`
+
+```{r}
+mape <- function(y, yhat) { 
+  return(mean(abs(y - yhat)/ y)) 
+} 
+mape(eval$y, eval$yhat)
+```
+
+Bisa dilihat bahwa nilai MAPE dari model adalah 0.04, sehingga akurasi dari model adalah 0,96 (96%). Jadi bisa disimpulkan bahwa model sangat akurat dalam melakukan prediksi.

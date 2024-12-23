@@ -1,7 +1,7 @@
 ---
 title: "Modul-10 Regresi Logistik"
 author: "Roni Yunis"
-date: '2023-12-18'
+date: '2024-12-16'
 output:
 ---
 
@@ -59,6 +59,16 @@ ggplot(data, aes(data[,7],fill=..count..)) +
       geom_histogram(aes(y=..density..)) +
       geom_density(alpha=.2, fill="purple")
 ```
+
+```{r}
+# Histogram Insulin
+par(mfrow=c(4,2))
+ggplot(data, aes(data[,5],fill=..count..)) + 
+      geom_histogram(aes(y=..density..)) +
+      geom_density(alpha=.2, fill="purple")
+```
+
+
 Sekarang kita akan memvisualisasi data `outcome` yang kategorikal (1 atau 0) dengan mengunakan pie chart
 
 ```{r}
@@ -195,7 +205,7 @@ vif(logit4)
 Berdasarkan hasil perhitungan diperoleh nilai VIF untuk seluruh variabel prediktor dalam Model_4 < 5, sehingga asumsi multikolinearitas terpenuhi (tidak terjadi multikolinearitas antar variabel). Jadi bisa disimpulkan bahwa variabel `Pregnancies`, `Glucose`, `BloodPressure`, `BMI`, dan `DiabetesPredigreeFunction` berpengaruh signifikan terhadap `Outcome`
 
 # Latihan
-Berdasarkan kasus diatas, cobalah anda lakukan klasifikasi untuk mengidentifikasi pasien yang terkena diabetes dan yang tidak terkena diabetes serta lakukan evaluasi atas model klasifikasi yang sudah dihasilkan. Partisilah data ke dalam data training dan data testing.
+Berdasarkan kasus diatas, cobalah anda lakukan klasifikasi untuk mengidentifikasi pasien yang terkena diabetes dan yang tidak terkena diabetes serta lakukan evaluasi atas model klasifikasi yang sudah dihasilkan. Partisilah data ke dalam data training dan data testing. Gunakan salah satu model machine learning untuk klasifikasi yang sudah dipelajari sebelumnya. SVM/Naive Bayes/XGBoost/ dll.
 
 ```{r}
 # Load Library
@@ -211,9 +221,11 @@ set.seed(100) #pengambilan data secara random
 
 #untuk data training diambil 70%, sisanya untuk data testing, berdasarkan variabel outcome
 index_train <- createDataPartition(data$Outcome,
-                                   p = 0.8,list = FALSE)
+                                   p = 0.7,
+                                   list = FALSE,
+                                   times = 1)
 
-data.train <- data[index_train,] # 80% untuk data training
+data.train <- data[index_train,] # 70% untuk data training
 data.test <- data[-index_train,] # sisanya atau 30% untuk data testing
 ```
 
@@ -232,26 +244,46 @@ modelForest <- randomForest(data=data.train,
 
 modelForest
 ```
-Dari mode dapat dilihat bahwa tingkat kesalahan adalah 22.93%, dengan akurasi sebesar 77.07%
+Dari mode dapat dilihat bahwa tingkat kesalahan adalah 23.98%, dengan akurasi sebesar 76.02%
 
 **Latihan**
 Lakukan tuning hyperparameter untuk meningkatkan kinerja dari model.
 
+**Latihan*
+Coba dilakukan ekplorasi pada metode Hyperparameter tuning. Ada 3 pendekatan atau metode:
+1. Grid Search
+2. Random Search
+3. Bayesian Search
+
+
+
+
 ```{r}
 # your code
+set.seed(123) #menentukan nilai acak dari data
 
+modelForest2 <- randomForest(data=data.train,
+               as.factor(Outcome)~.,
+               ntree=100, mtry=3)
+
+modelForest2
 
 
 ```
-
-
 
 ```{r}
 prediksiForest <- predict(modelForest, data.test)
-head(prediksiForest, 20)
+head(prediksiForest)
 ```
 ```{r}
-head(data.test$Outcome,20)
+head(data.test$Outcome)
+```
+```{r}
+prediksiForest2 <- predict(modelForest2, data.test)
+head(prediksiForest2, 10)
+```
+```{r}
+head(data.test$Outcome, 10)
 ```
 
 ```{r}
@@ -261,6 +293,12 @@ plot(prediksiForest)
 conf_Matrix <- table(prediksiForest, data.test$Outcome)
 conf_Matrix
 ```
+```{r}
+conf_Matrix2 <- table(prediksiForest2, data.test$Outcome)
+conf_Matrix2
+```
+
+
 
 **Latihan**
 Evaluasi model Klasifikasi dengan `Accuracy`, `Precision`, dan `Recall`
@@ -271,16 +309,35 @@ cm <-  table(data.test[,9], prediksiForest)
 
 accuracy <- confusionMatrix(cm)$overall["Accuracy"]
 precision <- confusionMatrix(cm)$byClass["Precision"]
-sensitivity <- confusionMatrix(cm)$byClass["Sensitivity"]
+recall <- confusionMatrix(cm)$byClass["Recall"]
 F1 <- confusionMatrix(cm)$byClass["F1"]
 
 #Menampilkan hasil evaluasi 
 accuracy
 precision
-sensitivity
+recall
 F1
 
 ```
+```{r}
+cm2 <-  table(data.test[,9], prediksiForest2)
+
+accuracy2 <- confusionMatrix(cm2)$overall["Accuracy"]
+precision2 <- confusionMatrix(cm2)$byClass["Precision"]
+recall2 <- confusionMatrix(cm2)$byClass["Recall"]
+F1_2 <- confusionMatrix(cm2)$byClass["F1"]
+
+#Menampilkan hasil evaluasi 
+accuracy2
+precision2
+recall2
+F1_2
+```
+
+
+
+
+
 ```{r}
 # Visualisasi kurva ROC
 library(pROC)
@@ -291,8 +348,55 @@ plot(roc_curve, main = "ROC Curve", col = "blue", lwd = 2)
 ```
 **Interpretasi dan Kesimpulan:** 
 
-- Nilai akurasi Anda adalah 0.7581699, yang berarti model Anda berhasil mengklasifikasikan dengan benar sekitar 74.5% dari seluruh instance.
-- Nilai precision Anda adalah 0.8673469, yang berarti sekitar 86.7% dari instance yang diklasifikasikan sebagai positif oleh model adalah benar-benar positif.
-- Nilai sensitivity Anda adalah 0.7657658, yang berarti model Anda berhasil mengidentifikasi sekitar 76.57% dari semua instance yang sebenarnya positif.
-- Nilai F1 score Anda adalah 0.8133971, yang menunjukkan keseimbangan yang baik antara precision dan recall.
+- Nilai akurasi Anda adalah 0.773913, yang berarti model Anda berhasil mengklasifikasikan dengan benar sekitar 77.39% dari seluruh instance.
+- Nilai precision Anda adalah 0.8486842, yang berarti sekitar 84.86% dari instance yang diklasifikasikan sebagai positif oleh model adalah benar-benar positif.
+- Nilai sensitivity(Recall) Anda adalah 0.8164557, yang berarti model Anda berhasil mengidentifikasi sekitar 81.64% dari semua instance yang sebenarnya positif.
+- Nilai F1 score Anda adalah 0.8322581, yang menunjukkan keseimbangan yang baik antara precision dan recall.
 - Model ini memiliki kinerja yang baik secara umum, dengan akurasi yang lumayan dan keseimbangan yang baik antara precision dan recall.
+
+
+** Latihan **
+Lakukan analisis klasifikasi dengan model ML yang lain, seperti SVM.
+
+```{r}
+glimpse(data)
+```
+
+
+```{r}
+# Model SVM
+library(e1071)
+modelSVM <- svm(Outcome ~., 
+                data = data.train, 
+                kernel='radial', 
+                cost =1, 
+                scale=TRUE)
+summary(modelSVM)
+
+
+```
+```{r}
+# Prediksi dengan model SVM
+predictSVM <- predict(modelSVM, data.test)
+table(predictSVM, data.test$Outcome)
+```
+
+```{r}
+
+```
+
+
+
+** Latihan **
+Buatlah ringkasan terkait dengan hyperparameter tuning dalam peningkatan kinerja model prediksi. Secara umum, hyperparameter tersebut terbagi atas:
+1. Grid Search?
+2. Random Search?
+3. Bayesian Search?
+
+Jelaskan masing-masing perbedaannya. Kemudian buatkan contoh penerapannya dalam R Code.
+
+
+```{r}
+
+```
+

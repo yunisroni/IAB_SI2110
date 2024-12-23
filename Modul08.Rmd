@@ -50,11 +50,12 @@ library (tidyverse) = dplyr + ggplot2 + lubridate
 #Split dataset 
 library (caTools)
 #Predicting result visualization
-library(ggplot2)
+#library(ggplot2)
 #Import dataset marketing pada library datarium
 library(datarium)
 #library manipulasi data
-library(dplyr)
+#library(dplyr)
+library (tidyverse)
 
 ```
 
@@ -133,17 +134,17 @@ lm.r <- lm(sales ~ facebook,
            data = trainingset)
 summary(lm.r)
 ```
-Nilai P-Value = 0.000000003184 < 0.05 (sangat signifikan)
+Nilai P-Value = 0.00000000000000199 < 0.05 (sangat signifikan)
 
 $$Sales = \beta_0 + \beta_1facebook + \varepsilon$$
 
 
-$$Sales = 11.02329 + 0.20290.facebook + \varepsilon$$ 
+$$Sales = 11.23253 + 0.21291.facebook + \varepsilon$$ 
 
 Misalnya facebooknya Rp. 3500, berapakah nilai penjualan (sales)?
 Persamaan regresi linernya adalah:
 
-$$Sales = 11.02329 + (0.20290*3500) + \varepsilon$$ 
+$$Sales = 11.23253 + (0.21291*3500) + \varepsilon$$ 
 
 ```{r}
 sales_f = 11.02329 + (0.20290*3500)
@@ -242,18 +243,18 @@ lm.y <- lm(sales ~ youtube,
            data = trainingset)
 summary(lm.y)
 ```
-nilai p-value = 0.00000000000000022 (kecil dari 0,05) -> sangat signifikan
+nilai p-value = 0.00000000000000022 (p-value < 0,05) -> sangat signifikan
 
 
 Berdasarkan output diatas bisa dijelaskan bahwa:
 Persamaan regresi linernya adalah
 
-$$sales = 8.403306 + 0.048109*youtube$$
+$$sales = 8.414531 + 0.047215*youtube$$
 
 Misal youtube = 3500
 
 ```{r}
-sales.y = 8.403306 + (0.048109*3500)
+sales.y = 8.414531 + (0.047215*3500)
 sales.y
 ```
 
@@ -333,12 +334,12 @@ lm.n <- lm(sales ~ newspaper,
 summary(lm.n)
 
 ```
-$$Sales = 14.70610 + 0.05228 * newspaper + \varepsilon$$
+$$Sales = 14.84619 + 0.05993 * newspaper + \varepsilon$$
 Misal nilai newspapernya: 3500
 maka nilai:
 
 ```{r}
-sales_n = 14.70610 + (0.05228 * 3500)
+sales_n = 14.84619 + (0.05993 * 3500)
 sales_n
 ```
 ## Visualasi hasil data training newspaper
