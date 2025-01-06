@@ -133,6 +133,10 @@ daily_demandstore03
 ```
 Bisa dilihat bahwa data `date` sudah dalam type tanggal
 
+```{r}
+glimpse(daily_demandstore03)
+```
+
 
 ## Visualisasi Data
 kita akan memvisualisasi trankasi pada store 03 dari tahun 2013 sampai 2016
@@ -161,7 +165,7 @@ ggplotly(plotstore03)
 Data yang digunakan yaitu data permintaan harian di Store 3 yang sudah disimpan pada objek `daily_demandstore03`
 
 ```{r}
-daily_demandstore03
+head(daily_demandstore03)
 ```
 
 ## Menyiapkan data
@@ -187,7 +191,7 @@ model_ts <- prophet(daily.seasonality = TRUE, seasonality_prior_scale=0.1) %>%
 model_ts
 ```
 
-Berdasarkan hasil fitting model diatas bisa dijelaslkan bahwa **model_ts** sekarang menyimpan informasi data permintaan harian pada store 03. Sehingga kita bisa gunakan untuk mengekstrak informasi deret waktu tersebut untuk melakukan perkiraan selama periode waktu yang bisa ditentukan. Misalnya kita akan memperkiraan permintaan penjualan untuk 1 tahun kedepan. Utuk melakukan ini kita harus menyiapkan data frame yang terdiri dari rentang waktu/tanggal mendatang yang akan diperkirakan. Untungnya dalam `prophet()` sudah menyediakan sebuah fungsi `make_future_dataframe()` memudahkan kita untuk menyiapkan data tersebut.
+Berdasarkan hasil fitting model diatas bisa dijelaslkan bahwa **model_ts** sekarang menyimpan informasi data permintaan harian pada store 03. Sehingga kita bisa gunakan untuk mengekstrak informasi deret waktu tersebut untuk melakukan perkiraan selama periode waktu yang bisa ditentukan. Misalnya kita akan memperkiraan permintaan penjualan untuk 1 tahun kedepan. Untuk melakukan ini kita harus menyiapkan data frame yang terdiri dari rentang waktu/tanggal mendatang yang akan diperkirakan. Untungnya dalam `prophet()` sudah menyediakan sebuah fungsi `make_future_dataframe()` memudahkan kita untuk menyiapkan data tersebut.
 
 ```{r}
 range(train_daily_3$ds)
@@ -397,7 +401,7 @@ test %>%
 
 Bisa dilihat bahwa semua data testing ada pada tahun 2017.
 
-Kita akan bandingkan data set Test dengan data set Training utk data sebelum tahun 2018, karena data train hanya sampai akhir 2016
+Kita akan bandingkan data set Test dengan data set Training utk data sebelum tahun 2017, karena data train hanya sampai akhir 2016
 
 ```{r}
 cutoff <- dmy("01-01-2016") 

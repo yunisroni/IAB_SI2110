@@ -1,0 +1,226 @@
+---
+title: "Modul 12 - Studi Kasus Analisis Big Data"
+author: "Roni Yunis"
+date: "2024-01-08"
+output: html_document
+---
+
+**NLP** atau _Natural Language Processing_ adalah cabang dari kecerdasan buatan yang fokus pada interaksi antara komputer dan bahasa manusia yang alami. NLP merupakan suatu teknik dalam Machine Learning (ML) yang memfokuskan pada pemahaman dan pengaplikasian hubungan antara bahasa manusia dengan komputer. Penerapan NLP melibatkan penggunaan model ML pada teks atau bahasa, termasuk juga dalam konteks pengolahan bahasa suara. **Tujuan utamanya** adalah memungkinkan komputer untuk memahami, memproses, dan menghasilkan bahasa manusia dengan cara yang bermakna. NLP adalah salah satu teknik/metode yang mendukung analisis big data.
+
+Contoh penerapan NLP dalam bidang bisnis meliputi:
+
+1. **Analisis Sentimen Pelanggan:**
+   - NLP digunakan untuk menganalisis sentimen pelanggan dari ulasan produk atau layanan di media sosial, forum, atau situs web.
+   - Perusahaan dapat memahami apakah umpan baliknya positif, negatif, atau netral, membantu mereka memperbaiki produk atau layanan mereka.
+
+2. **Chatbots dan Layanan Pelanggan Otomatis:**
+   - Implementasi chatbot menggunakan NLP memungkinkan perusahaan untuk memberikan layanan pelanggan otomatis 24/7.
+   - Chatbot dapat memahami pertanyaan atau keluhan pelanggan dan memberikan jawaban yang sesuai.
+
+3. **Analisis Teks Bisnis:**
+   - NLP digunakan untuk menganalisis dokumen bisnis seperti laporan keuangan, kontrak, dan dokumen hukum.
+   - Hal ini membantu dalam ekstraksi informasi penting, identifikasi tren, dan memahami konteks dokumen.
+
+4. **Pemrosesan Bahasa Alami di E-commerce:**
+   - NLP membantu meningkatkan pencarian produk dengan memahami pertanyaan pengguna dan memberikan hasil yang lebih relevan.
+   - Sistem rekomendasi juga dapat menggunakan NLP untuk memahami preferensi pelanggan dan menyarankan produk yang sesuai.
+
+5. **Pemrosesan Permintaan dan Analisis Data:**
+   - Dalam konteks bisnis, NLP dapat digunakan untuk memproses permintaan dari pelanggan atau mitra bisnis dan mengekstrak informasi yang relevan dari dokumen atau email.
+
+6. **Analisis Kontrak dan Hukum:**
+   - NLP membantu perusahaan dalam menganalisis kontrak dan dokumen hukum dengan cepat dan efisien, membantu dalam pemahaman ketentuan kontrak dan identifikasi risiko potensial.
+
+7. **Pemahaman Pengguna pada Platform Digital:**
+   - NLP digunakan untuk meningkatkan pengalaman pengguna pada platform digital dengan memahami dan merespons pertanyaan atau perintah yang diajukan oleh pengguna.
+
+Implementasi NLP dalam konteks bisnis membantu perusahaan meningkatkan efisiensi operasional, memahami kebutuhan pelanggan, dan mengoptimalkan strategi berdasarkan analisis bahasa manusia.
+
+
+# Load Library
+```{r}
+# Library manipulasi data, tanggal dan visualisasi
+library(tidyverse)
+
+# Library utk transformasi dan penyesuaian skala grafik
+library(scales)
+
+# Library utk menstrukturisasi data
+library(reshape2)
+
+# Library utk text mining atau analisis teks
+library(tm)
+
+# Library utk stemming (penghapusan akhiran kata)
+library(SnowballC)
+
+# Library utk membuat word cloud
+library(wordcloud)
+
+# Library yg menyediakan palet warna utk visualisasi data
+library(RColorBrewer)
+
+# Library utk manipulasi string yang lebih konsisten
+library(stringr)
+
+# Library utk analisis sentimen dan utk mengekstrak nuansa emosional dari teks
+library(syuzhet) 
+
+```
+
+**library(tm)**
+
+Library `tm` atau text mining digunakan untuk membersihkan, mentransformasi dan menganalisis data teks. Library `tm` (text mining) dalam R memiliki fungsi utama terkait pemrosesan teks dan pengelolaan data teks. Beberapa fungsi kunci dari library `tm` dalam tugas Pemrosesan Bahasa Alami (Natural Language Processing/NLP) adalah sebagai berikut:
+
+1. **Pembuatan Corpus:**
+   - Fungsi `Corpus`: Membantu membuat korpus, yang merupakan kumpulan dokumen teks. Ini adalah struktur dasar untuk mengelola dan menganalisis data teks.
+
+2. **Pembersihan Teks:**
+   - Fungsi `tm_map`: Memungkinkan aplikasi berbagai teknik pembersihan dan pra-pemrosesan teks pada korpus. Ini bisa termasuk penghapusan tanda baca, konversi menjadi huruf kecil, stemming, dan lainnya.
+
+3. **Pembuatan Matrix Dokumen-Term (DTM):**
+   - Fungsi `DocumentTermMatrix`: Mengonversi korpus menjadi matrix dokumen-term, di mana setiap baris mewakili satu dokumen, setiap kolom mewakili istilah unik, dan nilai mewakili frekuensi setiap istilah dalam dokumen yang bersangkutan.
+
+4. **Transformasi Term Frequency-Inverse Document Frequency (TF-IDF):**
+   - Fungsi `weightTfIdf`: Mengubah matrix dokumen-term menjadi matrix TF-IDF, memberikan bobot lebih pada istilah yang penting dalam dokumen tertentu tetapi tidak umum di seluruh dokumen.
+
+5. **Transformasi Teks:**
+   - `tm_map` dengan fungsi transformasi khusus: Memungkinkan berbagai transformasi seperti penghapusan stopwords, stemming, dan tugas pemrosesan teks lainnya.
+
+6. **Pemfilteran Istilah:**
+   - Fungsi `removeSparseTerms`: Membantu menghapus istilah yang jarang muncul atau istilah yang muncul dalam sedikit dokumen, mengurangi dimensionalitas data.
+
+7. **Konversi ke Huruf Kecil:**
+   - `content_transformer(tolower)`: Mengonversi semua teks menjadi huruf kecil, memastikan konsistensi dalam analisis teks.
+
+8. **Penghapusan Stopword:**
+   - Fungsi `removeWords`: Menghapus stopwords umum dari data teks, yaitu kata-kata yang seringkali tidak banyak berkontribusi pada makna teks.
+
+9. **Stemming dan Lemmatization:**
+   - `tm_map` dengan fungsi stemming dan lemmatization khusus: Memungkinkan pengurangan kata menjadi bentuk dasar atau akar, membantu mengkonsolidasikan variasi kata.
+
+10. **Akses ke Metadata Teks:**
+    - Fungsi-fungsi `meta`: Memungkinkan untuk mengakses dan memanipulasi metadata yang terkait dengan dokumen, memberikan informasi tambahan tentang data teks.
+
+Secara keseluruhan, library `tm` adalah alat yang sangat berguna untuk penambangan teks dan NLP dalam lingkungan R, dengan menawarkan berbagai fungsi untuk membersihkan, mentransformasi, dan menganalisis data teks.
+
+**library(SnowballC)**
+
+Library `SnowballC` dalam R adalah salah satu library yang digunakan untuk melakukan stemming, yaitu proses mengubah kata-kata menjadi bentuk dasar atau kata dasar. Fungsi utamanya adalah mempermudah analisis teks dengan mengurangi kata-kata ke bentuk dasarnya.
+
+
+# Obstain and Import Data
+
+download dataset melalui link ini:
+https://www.kaggle.com/code/akshat0311/youtube-comments-sentiment-analysis/input?select=GBcomments.csv
+
+
+```{r}
+text <- readLines("data/GBcomments.csv", n = 10000)
+
+#Convert the file to UTF-8 encoding 
+#karakter yang tidak dapat diwakili dengan ASCII akan dihapus dari teks
+s2 <- iconv(text, "UTF-8", "ASCII", sub = "")
+text <- s2
+
+head(text)
+```
+
+# Scrub and EDA
+```{r}
+#Menyiapkan corpus
+
+docs <- Corpus(VectorSource(text))
+```
+
+```{r}
+#Membersikan data
+
+#mengganti pola tertentu dengan spasi kosong dalam suatu teks
+trans <- content_transformer(function (x , pattern ) gsub(pattern, " ", x))
+
+#menganti "/" dengan spasi kosong
+docs <- tm_map(docs, trans, "/")
+
+#menganti "@" dengan spasi kosong
+docs <- tm_map(docs, trans, "@")
+
+#menganti "\\|" dengan spasi kosong
+docs <- tm_map(docs, trans, "\\|")
+
+#mengkonversi semua huruf ke huruf kecil
+docs <- tm_map(docs, content_transformer(tolower))
+
+#menghapus angka
+docs <- tm_map(docs, removeNumbers)
+
+#menghapus kata-kata umum (stopwords)
+docs <- tm_map(docs, removeWords, stopwords("english"))
+
+#menghapus tanda baca
+docs <- tm_map(docs, removePunctuation)
+
+#menghapus spasi berlebih
+docs <- tm_map(docs, stripWhitespace)
+
+#melakukan stemming atau mengubah kata-kata menjadi bentuk dasar
+docs <- tm_map(docs, stemDocument)
+```
+
+```{r}
+#Membuat dokumen term matrix
+
+dtm <- TermDocumentMatrix(docs)
+mat <- as.matrix(dtm)
+v <- sort(rowSums(mat),decreasing=TRUE)
+
+```
+
+```{r}
+#Konversi ke Data frame
+data <- data.frame(word = names(v),freq=v)
+head(data, 10)
+```
+
+# Model and Visualisasi
+```{r}
+#Membuat wordcloud
+
+set.seed(1056)
+wordcloud(words = data$word, freq = data$freq, min.freq = 1,
+          max.words=200, random.order=FALSE, rot.per=0.35,
+          colors=brewer.pal(8, "Dark2"))
+```
+
+```{r}
+#mengambil kata2 sentiment dari teks
+
+Sentiment <- get_nrc_sentiment(text)
+head(Sentiment)
+text <- cbind(text,Sentiment)
+```
+
+```{r}
+#Menghitung kata sentiment berdasarkan kategori
+
+TotalSentiment <- data.frame(colSums(text[,c(2:11)]))
+names(TotalSentiment) <- "count"
+TotalSentiment <- cbind("sentiment" = rownames(TotalSentiment), TotalSentiment)
+rownames(TotalSentiment) <- NULL
+
+TotalSentiment
+
+```
+
+```{r}
+#Menampilkan total sentiment score
+
+ggplot(data = TotalSentiment, aes(x = sentiment, y = count)) +
+  geom_bar(aes(fill = sentiment), stat = "identity") +
+  theme(legend.position = "none") +
+  xlab("Sentiment") + 
+  ylab("Total Count") + 
+  ggtitle("Total Sentiment Score") 
+  
+```
+
