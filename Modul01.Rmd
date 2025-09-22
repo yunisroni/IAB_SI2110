@@ -113,6 +113,18 @@ inteligensi <- "Analitika Bisnis"
 ```
 
 kata `inteligensi` di atas disebut dengan **objek** yang menampung nilai yaitu "Analitika Bisnis" atau disebut juga dengan assign (<-). (<-) bisa dibuat dengan cepat menggunakan kombinasi "Alt + - ". 
+
+```{r}
+a <- 3
+b <- 5
+c = a/b
+```
+
+```{r}
+nama_saya <- "Roni YUnis"
+```
+
+
 Jika Anda menjalankan chunk di atas, maka sekarang akan muncul objek `inteligensi` pada panel inveronment. Untuk memanggil objek yang sudah dibuat kita bisa menjalan chunk dibawah ini
 
 ```{r}
@@ -125,7 +137,9 @@ c= a+b
 ```{r}
 inteligensi
 ```
-
+```{r}
+nama_saya
+```
 Perlu diperhatikan bahwa R bahasa pemrograman yang *case sensitive* sehingga "Analitika Bisnis" akan berbeda dengan "analitika bisnis". Untuk memeriksa apakah nilai pada sisi kiri sama dengan sisi kanannya, bisa menggunakan operator `==` atau persamaan. Jika hasilnya adalah `FALSE` artinya kedua nilai tersebut tidak sama atau berbeda, karena nilai yang disimpan pada objek inteligensi adalah Analitika Bisnis bukan analitika bisnis.
 
 ```{r}
@@ -152,7 +166,7 @@ Pada umumnya struktur data dari objek di R adalah Vector. Vector merupakan kumpu
 
 ```{r}
 # character
-a_char <- c("STMIK", "Mikroskil", "Sistem Informasi", "Medan", "Roni Yunis")
+a_char <- c("Universitas", "Mikroskil", "Sistem Informasi", "Medan", "Roni Yunis")
 # complex
 a_comp <- c(1+3i, (1+3i)*2)
 # numeric
