@@ -37,6 +37,8 @@ library (dplyr)
 glimpse(asuransi)
 ```
 
+dplyr adalah library yang digunakan untuk manipulasi data: untuk melihat struktur data, menfilter data, men-select data, mengganti type data, dll)
+
 Dari data insurance.csv, bisa kita lihat bahwa data terdiri dari 1338 baris observasi dan 7 buah variabel. Untuk contoh kali kita akan menggunakan satu atau dua dari 4 buah variabel dengan type data numerik/integer yaitu **age**, **charges**, **bmi**, dan **children** yang nantinya akan dianalisis dengan pendekatan deskriptif.
 
 ```{r}
@@ -69,6 +71,7 @@ max(asuransi$children)
 
 
 ```
+
 ```{r}
 min(asuransi$bmi)
 max(asuransi$bmi)
@@ -103,6 +106,7 @@ range(asuransi$bmi)
 
 
 ```
+
 hitunglah range dari variabel `charges`
 ```{r}
 range(asuransi$charges)
@@ -198,6 +202,12 @@ quantile(asuransi$age, 0.25)
 ```{r}
 quantile(asuransi$age, 0.75)
 ```
+```{r}
+quantile(asuransi$age, 1)
+```
+
+
+
 *Latihan*
 1. Berapakah nilai kuartil 75% dari variabel `children`
 2. Berapakah nilai kuartil 25% dari variabel `charges`
@@ -208,15 +218,32 @@ quantile(asuransi$age, 0.75)
 quantile(asuransi$children, 0.75)
 
 ```
+
 ```{r}
 quantile(asuransi$children, 0.5)
 ```
+
 ```{r}
 quantile(asuransi$children, 0.25)
 ```
+
 ```{r}
 boxplot(asuransi$children)
 ```
+
+```{r}
+boxplot(asuransi$age)
+```
+#Latihan
+Lakukan secara mandiri untuk variabel numerik yang lain dengan boxplot()
+
+```{r}
+#your code
+
+
+
+```
+
 
 
 ## Standar Deviasi dan Variance
@@ -293,7 +320,7 @@ cor(asuransi$age, asuransi$bmi)
 Nilai korelasi dari kedua variabel tersebut adalah 0.29. Bisa kita simpulkan korelasi dari keduanya lemah. Nilai Korelasi berkisar antara 1 sampai -1. Jika nilai mendekati 1 atau -1 itu artinya hubungan antara 2 variabel kuat, tapi kalau nilai korelasi mendekati 0, artinya hubungan antara 2 variabel lemah.
 
 *Latihan*
-Hitung Korelasi antar bmi - charges, children - bmi, age - children.
+Hitung Korelasi antar (bmi - charges), (children - bmi), (age - children).
 
 ```{r}
 # your code
@@ -355,7 +382,7 @@ prop.table(table(asuransi$sex, asuransi$smoker))
 Hutunglah hubungan sex dengan region, dan berapa nilai proporsi dari hubungan tersebut?
 
 ```{r}
-# nilai frekuensi hubungan antara bmi dengan charger
+# nilai frekuensi hubungan antara sex dengan region
 sex_region <- table(asuransi$sex, asuransi$region)
 sex_region
 
@@ -389,8 +416,12 @@ prop.table(table(asuransi$sex, asuransi$smoker), margin = 2)
 Kita juga bisa membulatkan suatu bilangan desimal berkoma dengan fungsi `round()`. Misalnya kita ingin menghitung persentase per baris atau kolom pada proporsi sebelumnya, maka kita bisa tambahkan fungsi `round(prop.table(), 1),2)`. 1 untuk baris, dan 2 untuk kolom atau 2 digit dibelakang koma
 
 ```{r}
-round(prop.table(table(asuransi$sex, asuransi$smoker),1),2)
+round(prop.table(table(asuransi$sex, asuransi$smoker),1),3)
 ```
+```{r}
+round(prop.table(table(asuransi$sex, asuransi$smoker),2),2)
+```
+
 
 ## Statistik Deskriptif dengan Fungsi `descr()`
 Fungsi `descr()` merupakan fungsi untuk menampilkan statistik deskriptif secara langsung. Bisa menampilkan standar deviasi, minimum, maksimum, Q1, Q3, dan median sekaligus. Data yang ditampikan hanya bertype data numeric. Untuk menjalankan fungsi `descr()` kita harus menginstal terlebih dahulu `library (summarytools)`
@@ -489,7 +520,7 @@ Berikut ini adalah contoh bagaimana histogram dengan fungsi `geom_histogram()` p
 
 ```{r}
 ggplot(asuransi, 
-       aes(x = charges)) + 
+       aes(x = age)) + 
   geom_histogram() +
   theme_minimal()
 ```
